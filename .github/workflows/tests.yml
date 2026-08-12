@@ -1,0 +1,91 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Structural invariants Godot cannot check: a demo advertising keys it
+      # never binds still runs fine. See tools/check_docs.py.
+      - name: Check documentation structure
+        run: ./tools/check_docs.py
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Godot reports GDScript warnings (unused variables, shadowed names,
+      # style) only inside the editor — a headless run prints nothing. gdtoolkit
+      # is what gives CI a static check below the level of "it fails to parse".
+      - name: Install gdtoolkit
+        run: pip install "gdtoolkit==4.*"
+
+      - name: gdlint
+        run: gdlint $(git ls-files '*.gd')
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        # The collection lost 63 demos to API drift between 4.2 and 4.7 because
+        # nothing ran against a newer engine until long after the fact. Testing
+        # the supported floor, the middle, and the current release surfaces that
+        # on the day it happens. `primary` picks the version whose result gates
+        # the branch; the others are advisory.
+        godot: ["4.5.1", "4.6.1", "4.7.1"]
+        include:
+          - godot: "4.7.1"
+            primary: true
+    name: test (Godot ${{ matrix.godot }})
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ !matrix.primary }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ matrix.godot }}-linux
+
+      - name: Download Godot (headless)
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${{ matrix.godot }}-stable/Godot_v${{ matrix.godot }}-stable_linux.x86_64.zip"
+          curl -fsSL "$url" -o /tmp/godot.zip
+          unzip -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${{ matrix.godot }}-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      # Importing 157 cold projects is the most expensive step. The cache is
+      # keyed on the project sources, so it is reused until a demo changes;
+      # run-tests.sh re-imports only the demos whose files are newer than their
+      # cache, so a partially stale restore still produces a correct run.
+      - name: Cache Godot import artifacts
+        uses: actions/cache@v4
+        with:
+          path: "*/.godot"
+          key: godot-import-${{ matrix.godot }}-${{ hashFiles('*/project.godot', '*/**/*.gd', '*/**/*.tscn', '*/**/*.gdshader', '*/**/*.svg') }}
+          restore-keys: godot-import-${{ matrix.godot }}-
+
+      - name: Run checks
+        # run-tests.sh imports what needs importing, then boots every demo's
+        # main scene headless before running its logic suite. The smoke step is
+        # what catches a demo whose scripts do not parse — the logic suites
+        # build their own objects and would stay green regardless. Demos are
+        # independent projects, so the work fans out across the runner's cores.
+        run: |
+          export PATH="$HOME/godot:$PATH"
+          ./run-tests.sh

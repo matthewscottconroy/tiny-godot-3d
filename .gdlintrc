@@ -1,0 +1,28 @@
+# gdlint configuration.
+#
+# Godot reports GDScript warnings only inside the editor — a headless run prints
+# nothing — so this is the repo's static check. The rules kept below are the ones
+# that catch real problems (dead arguments, tautological comparisons, mixed
+# indentation, naming). The disabled ones are stylistic rules that conflict with
+# how these demos are written on purpose:
+#
+#   class-definitions-order  Demos order declarations to read top-to-bottom as a
+#                            lesson, not to satisfy a canonical section order.
+#   max-line-length          Aligned tables of constants and long draw_string()
+#                            calls read better on one line than wrapped.
+#   function-variable-name   Tests declare local ALL_CAPS fixtures (MAP_DATA,
+#                            HOVER_DELAY) to mirror the constant they stand for.
+#   no-else-return /         Explicit symmetrical branches are clearer than the
+#   no-elif-return /         early-return rewrites in teaching code.
+#   max-returns
+#
+# gdformat is deliberately NOT run over this repo: it would reformat 412 of 418
+# files, collapsing the hand-aligned constant tables that make the demos
+# readable. Indentation consistency is covered by mixed-tabs-and-spaces instead.
+disable:
+  - class-definitions-order
+  - max-line-length
+  - function-variable-name
+  - no-else-return
+  - no-elif-return
+  - max-returns

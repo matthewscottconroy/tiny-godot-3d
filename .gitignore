@@ -1,0 +1,30 @@
+# Godot 4+ specific ignores
+.godot/
+.nomedia
+
+# Build output from tools/export_web.sh
+build/
+
+# Godot-specific ignores
+.import/
+export.cfg
+export_credentials.cfg
+*.tmp
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono-specific ignores
+.mono/
+data_*/
+mono_crash.*.json
+
+# NOTE: *.uid and *.import files are deliberately NOT ignored.
+#
+#   *.uid     Godot 4.4+ writes a stable resource identity next to each script
+#             and resource. Ignoring them makes Godot mint new UIDs per clone,
+#             which breaks `uid://` references between files.
+#   *.import  Import settings for each asset. Without them a fresh clone cannot
+#             load its own textures until someone runs an editor/import pass.
+#
+# Both are engine-generated but belong in version control.

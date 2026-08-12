@@ -1,0 +1,68 @@
+# Orbit Camera
+
+A third-person camera that orbits a target, with pitch limits, zoom, and camera-relative movement.
+
+## Purpose
+
+Third-person cameras look simple and are full of small traps. Apply yaw and pitch in the wrong order and the horizon rolls as you look up. Let pitch reach straight up or straight down and the look-at basis degenerates, so the view snaps. Move the character along the camera's raw forward vector and it drifts into the floor as you look down.
+
+This demo puts the rig's maths in a plain `RefCounted` — no camera node, no viewport — so all of that is visible, testable, and reusable. The camera node just receives the position the rig computes.
+
+## Controls
+
+| Input | Action |
+|-------|--------|
+| Hold right mouse | Orbit |
+| Mouse wheel | Zoom in / out |
+| Arrow keys | Move the target (camera-relative) |
+
+## How It Works
+
+**Pitch then yaw, applied to a fixed back-vector.** The offset starts as `(0, 0, distance)`, rotates about X by pitch, then about Y by yaw. That order keeps the camera upright at every combination. Positive pitch lifts the camera above the target, which is the convention that made the maths read the right way round — the first version had it inverted, and the test suite is what caught it.
+
+**Pitch is clamped short of vertical.** `min_pitch` and `max_pitch` stop just before straight up and straight down, because `look_at` has no unique answer when the view direction is parallel to the up vector.
+
+**Movement uses a flattened basis.** `ground_basis()` takes the camera's forward, zeroes its Y, and renormalises. `movement_direction()` combines that with the input vector, so "forward" always means "away from the camera along the ground" regardless of pitch.
+
+**Obstruction pulls the camera in.** `pulled_in(hit_distance)` shortens the offset along the same direction, never below `min_distance`, so the view never ends up inside a wall.
+
+## Key Godot APIs
+
+| API | Purpose |
+|-----|---------|
+| `Vector3.rotated(axis, angle)` | Yaw and pitch the offset |
+| `Node3D.look_at(target, up)` | Aim the camera — undefined when looking straight up |
+| `Vector3.cross()` | Derive the right vector from forward |
+| `clampf()` | Pitch and zoom limits |
+| `InputEventMouseMotion.relative` | Frame-to-frame mouse delta |
+| `Input.mouse_mode` | Capture the cursor while orbiting |
+
+## Files
+
+| File | What it holds |
+|------|---------------|
+| `scripts/orbit_rig.gd` | The `OrbitRig` component: orbit maths, limits, ground basis, pull-in |
+| `scripts/main.gd` | Demo driver: mouse handling and applying the result to a `Camera3D` |
+| `scenes/main.tscn` | The runnable scene |
+| `tests/test_logic.gd` | Headless test suite |
+
+## Use as a building block
+
+**Copy:** `scripts/orbit_rig.gd` — the `OrbitRig` type. `scripts/main.gd` is the demo driver and is not needed.
+
+**Public API**
+- `position_for(target) -> Vector3`, `offset() -> Vector3`
+- `look(relative: Vector2)`, `zoom(steps: float)`
+- `ground_basis() -> Dictionary`, `movement_direction(input: Vector2) -> Vector3`
+- `pulled_in(hit_distance, padding := 0.3) -> Vector3`
+- `distance`, `yaw`, `pitch`, `min_pitch`, `max_pitch`, `sensitivity`
+
+**Integrate**
+1. Keep one rig per camera. Each frame: `camera.position = rig.position_for(target.global_position)` then `camera.look_at(...)`.
+2. Feed character movement through `movement_direction()` so it stays camera-relative.
+3. For pull-in, raycast from the target toward `rig.offset()` and pass the hit distance to `pulled_in()`.
+
+**Notes**
+- `class_name OrbitRig` is global to the project — rename it if you already define that type.
+- Mouse sensitivity should be a player setting, not a constant.
+- The rig has no opinion about smoothing. Lerping the camera toward `position_for()` rather than snapping is usually what you want, but it belongs in the caller.

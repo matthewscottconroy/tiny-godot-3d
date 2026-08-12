@@ -1,0 +1,70 @@
+# Procedural Mesh
+
+Building geometry in code with `SurfaceTool`: vertices, winding order, indices, and normals.
+
+## Purpose
+
+Generated geometry underpins terrain, destructible objects, and anything whose shape is decided at runtime. `SurfaceTool` is Godot's front door to it, and three details decide whether the result looks right or looks broken in a confusing way.
+
+**Winding order** decides which side of a triangle is visible. Get it backwards and the mesh is invisible from the side you are looking at, which reads as "my mesh did not load" rather than "my triangles face the wrong way". **Indices** decide whether vertices are shared between triangles or duplicated, which is the difference between a smooth surface and a faceted one. **Normals** decide how it lights; without them, everything is flat black.
+
+This demo builds a grid and a ring so both the shared-vertex and the wrap-around cases are visible — and its test suite checks the normals point up, which is exactly the assertion that catches a winding mistake.
+
+## Controls
+
+| Key | Action |
+|-----|--------|
+| 1 / 2 | Fewer / more subdivisions |
+| H | Toggle the height function |
+
+## How It Works
+
+**`SurfaceTool` is a builder.** `begin(PRIMITIVE_TRIANGLES)`, add attributes then vertices, add indices, `commit()` to an `ArrayMesh`. Attributes are set *before* the vertex they belong to — `set_uv()` then `add_vertex()`, not the other way round.
+
+**The grid shares its vertices.** A subdivided plane has `(n+1)²` vertices and `n² × 6` indices: each interior vertex is referenced by up to six triangles rather than duplicated per triangle. That is what indices are for.
+
+**Height is a `Callable`.** Passing a function sampled per vertex is what turns the same code into terrain — supply noise instead of a sine and nothing else changes.
+
+**Normals are generated, not assumed.** `generate_normals()` derives them from the geometry. Assuming "up" works for a flat plane and is wrong the moment a height function is applied.
+
+**The ring wraps.** Its last segment indexes back to vertex 0, which is what closes it. The test asserts every vertex is referenced, because an off-by-one there leaves a visible gap.
+
+## Key Godot APIs
+
+| API | Purpose |
+|-----|---------|
+| `SurfaceTool.begin(Mesh.PRIMITIVE_TRIANGLES)` | Start a triangle surface |
+| `SurfaceTool.add_vertex()` / `set_uv()` | Add geometry; attributes come first |
+| `SurfaceTool.add_index()` | Share vertices between triangles |
+| `SurfaceTool.generate_normals()` | Derive normals from the geometry |
+| `SurfaceTool.commit()` | Produce an `ArrayMesh` |
+| `ArrayMesh.surface_get_arrays()` | Read the result back — how the tests inspect it |
+
+## Files
+
+| File | What it holds |
+|------|---------------|
+| `scripts/mesh_builder.gd` | The `MeshBuilder` component: grid and ring construction |
+| `scripts/main.gd` | Demo driver: rebuilds on parameter changes |
+| `scenes/main.tscn` | The runnable scene |
+| `tests/test_logic.gd` | Headless test suite, including that a flat grid's normals face up |
+
+## Use as a building block
+
+**Copy:** `scripts/mesh_builder.gd` — the `MeshBuilder` type. `scripts/main.gd` is the demo driver and is not needed.
+
+**Public API**
+- `static grid(size, subdivisions, height := Callable()) -> ArrayMesh`
+- `static ring(radius, thickness, segments) -> ArrayMesh`
+- `static grid_counts(subdivisions) -> Dictionary`
+
+**Integrate**
+1. Assign the result to a `MeshInstance3D.mesh`.
+2. For terrain, pass a `FastNoiseLite` sample as the height callable.
+3. Rebuilding every frame is wasteful — regenerate only when a parameter changes, and consider `ArrayMesh.surface_update_vertex_region()` for animation.
+4. A generated mesh has no collision. Call `create_trimesh_collision()` on the `MeshInstance3D`, or build a `ConcavePolygonShape3D` from the same vertices.
+
+**Notes**
+- `class_name MeshBuilder` is global to the project — rename it if you already define that type.
+- Counter-clockwise winding faces the viewer in Godot. If a surface is invisible from where you expect to see it, swap two indices in each triangle before looking anywhere else.
+- `generate_normals()` averages across shared vertices, giving a smooth surface. For faceted shading, duplicate vertices per triangle instead of sharing them.
