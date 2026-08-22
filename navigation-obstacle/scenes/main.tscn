@@ -1,0 +1,97 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="floor_mesh"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="BoxShape3D" id="floor_shape"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_color = Color(0.32, 0.34, 0.38, 1)
+
+[sub_resource type="BoxMesh" id="door_mesh"]
+size = Vector3(4, 2.2, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="door_mat"]
+albedo_color = Color(0.8, 0.45, 0.2, 1)
+
+[sub_resource type="SphereMesh" id="agent_mesh"]
+radius = 0.4
+height = 0.8
+
+[sub_resource type="NavigationMesh" id="navmesh"]
+cell_size = 0.25
+agent_radius = 0.5
+geometry_parsed_geometry_type = 1
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 16, 10)
+
+[node name="Light" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707, 0.707, 0, -0.707, 0.707, 0, 8, 0)
+shadow_enabled = true
+
+[node name="Region" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("navmesh")
+
+[node name="Floor" type="StaticBody3D" parent="Region"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Region/Floor"]
+shape = SubResource("floor_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="Region/Floor"]
+mesh = SubResource("floor_mesh")
+material_override = SubResource("floor_mat")
+
+[node name="Door" type="Node3D" parent="Region"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Region/Door"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("door_mesh")
+material_override = SubResource("door_mat")
+
+[node name="Obstacle" type="NavigationObstacle3D" parent="Region/Door"]
+
+[node name="Agent" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 7)
+
+[node name="Mesh" type="MeshInstance3D" parent="Agent"]
+mesh = SubResource("agent_mesh")
+
+[node name="Nav" type="NavigationAgent3D" parent="Agent"]
+radius = 0.5
+height = 1.0
+avoidance_enabled = true
+max_speed = 3.0
+
+[node name="Path" type="MeshInstance3D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TitleLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 1000.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+
+[node name="ReadoutLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 1000.0
+offset_bottom = 130.0
+theme_override_font_sizes/font_size = 15
+
+[node name="StatusLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 560.0
+offset_right = 1000.0
+offset_bottom = 584.0
+theme_override_font_sizes/font_size = 14

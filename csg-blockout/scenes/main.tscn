@@ -1,0 +1,53 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="1"]
+size = Vector3(40, 0.5, 40)
+
+[sub_resource type="StandardMaterial3D" id="2"]
+albedo_color = Color(0.24, 0.26, 0.29, 1)
+
+[sub_resource type="StandardMaterial3D" id="3"]
+albedo_color = Color(0.62, 0.6, 0.56, 1)
+roughness = 0.95
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 22)
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 14, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("1")
+material_override = SubResource("2")
+
+[node name="Level" type="CSGCombiner3D" parent="."]
+use_collision = true
+material_override = SubResource("3")
+
+[node name="Baked" type="MeshInstance3D" parent="."]
+visible = false
+material_override = SubResource("3")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TitleLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 784.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+text = "CSG Blockout"
+
+[node name="StatusLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 560.0
+offset_right = 784.0
+offset_bottom = 584.0
+theme_override_font_sizes/font_size = 14

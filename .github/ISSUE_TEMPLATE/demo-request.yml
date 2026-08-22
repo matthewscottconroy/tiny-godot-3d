@@ -1,0 +1,45 @@
+name: Request a demo
+description: Suggest a concept the collection should cover
+labels: ["demo request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every demo here teaches one concept, completely. Good requests name a
+        single mechanism someone would search for — not a whole game.
+
+        This collection is young and most of it is missing, so a request is
+        genuinely useful: it is a vote on what to build next.
+
+        Check [docs/GAPS.md](../blob/main/docs/GAPS.md) first; it lists what is
+        already known to be missing.
+  - type: input
+    id: concept
+    attributes:
+      label: The concept
+      description: One line. What would the demo teach?
+      placeholder: "Spring-arm camera that pulls in through geometry"
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is worth a demo
+      description: >
+        What goes wrong without it, or what is hard to work out from the Godot
+        docs alone? The best demos exist because a specific thing is easy to get
+        subtly wrong.
+    validations:
+      required: true
+  - type: dropdown
+    id: dimension
+    attributes:
+      label: Which collection
+      options: ["3D (tiny-godot-3d)", "2D (tiny-godot-games)", "Either"]
+    validations:
+      required: true
+  - type: textarea
+    id: prior
+    attributes:
+      label: Closest existing demo
+      description: If something already covers part of this, which one, and what is missing?

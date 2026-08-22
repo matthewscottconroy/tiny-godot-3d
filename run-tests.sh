@@ -3,9 +3,9 @@
 # Run the checks for every demo (or the demos named as arguments).
 #
 #   ./run-tests.sh                 # check all demos
-#   ./run-tests.sh state-machine   # check one or more specific demos
+#   ./run-tests.sh orbit-camera    # check one or more specific demos
 #   GODOT=/path/to/godot ./run-tests.sh
-#   JOBS=4 ./run-tests.sh          # limit concurrency (default: CPU count)
+#   JOBS=4 ./run-tests.sh          # limit concurrency (see the default below)
 #   ./run-tests.sh --smoke-only    # skip the logic suites
 #   ./run-tests.sh --tests-only    # skip the smoke check
 #   ./run-tests.sh --reimport      # force a re-import even if nothing changed
@@ -26,10 +26,33 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
+# Memory safeguards: bounded concurrency, a pre-flight refusal, a live floor,
+# and child reaping on interrupt. See tools/memguard.sh and docs/MEMORY.md.
+source "$(dirname "$0")/tools/memguard.sh"
+
 GODOT="${GODOT:-godot}"
 
 # Any of these in the output means the demo is broken, even when Godot exits 0.
 ERROR_RE='Parse Error|SCRIPT ERROR|SHADER ERROR|Failed to load|Failed to instantiate|^ERROR: '
+
+# Errors that abandon the function they happen in, which is the dangerous kind
+# inside a test: the assertions after them never run, the suite prints a
+# smaller n/n passed, and the counts still agree. Deliberately narrower than
+# ERROR_RE — a suite that drives a script outside its scene logs "Node not
+# found" for each @onready, which is noise rather than a failure.
+SUITE_ABORT_RE='previously freed|Invalid access to (property|index)|Nonexistent function|Invalid type in function|Invalid index|[Oo]ut of bounds|null (instance|value)|Division By Zero|Invalid assignment|Trying to assign value of type|Invalid call'
+
+# Warnings count too. Godot reports a refused operation as a warning rather
+# than an error, so a feature can silently do nothing and still pass every
+# other gate: in the 2D collection a demo set a SubViewport size its container
+# owned, and both of its modes rendered identically for as long as it existed.
+# 3D has more of these than 2D — an unsupported shadow mode, a mesh with no
+# surface, a viewport with no camera all warn and then carry on.
+WARN_RE='^WARNING: '
+
+# Except the ones we have already chased down and cannot fix from here — the
+# audio-shutdown leaks documented in docs/MEMORY.md.
+WARN_ALLOW='ObjectDB instance.*leaked at exit'
 
 # ---------------------------------------------------------------------------
 # Worker modes. The script re-invokes itself through xargs to get concurrency;
@@ -49,7 +72,7 @@ needs_import() {
 do_import() {
   local demo=$1
   if [ "$FORCE_IMPORT" -eq 1 ] || needs_import "$demo"; then
-    "$GODOT" --headless --path "$demo" --import --quit >/dev/null 2>&1 || true
+    mem_run_godot "$GODOT" --headless --path "$demo" --import --quit >/dev/null 2>&1 || true
   fi
 }
 
@@ -67,11 +90,13 @@ do_check() {
       failed=1
     else
       local smoke_out smoke_status smoke_errors
-      smoke_out="$("$GODOT" --headless --path "$demo" "$main_scene" --quit-after 90 2>&1)"
+      smoke_out="$(mem_capture mem_run_godot "$GODOT" --headless --path "$demo" "$main_scene" --quit-after 90)"
       smoke_status=$?
       smoke_errors="$(printf '%s\n' "$smoke_out" | grep -E "$ERROR_RE")"
-      if [ "$smoke_status" -ne 0 ] || [ -n "$smoke_errors" ]; then
-        detail="smoke: $main_scene, exit $smoke_status"$'\n'"$(printf '%s\n' "$smoke_errors" | sed 's/^/      | /')"
+      local smoke_warnings
+      smoke_warnings="$(printf '%s\n' "$smoke_out" | grep -E "$WARN_RE" | grep -Ev "$WARN_ALLOW")"
+      if [ "$smoke_status" -ne 0 ] || [ -n "$smoke_errors" ] || [ -n "$smoke_warnings" ]; then
+        detail="smoke: $main_scene, exit $smoke_status"$'\n'"$(printf '%s\n' "$smoke_errors$smoke_warnings" | grep -v '^$' | sed 's/^/      | /')"
         failed=1
       fi
     fi
@@ -87,13 +112,24 @@ do_check() {
       # needs a physics step — direct_space_state is only valid inside
       # _physics_process — would otherwise never run. Suites that finish in
       # _ready are unaffected.
-      local output status n m
-      output="$("$GODOT" --headless --path "$demo" res://tests/test.tscn --quit-after 5 2>&1)"
+      #
+      # A demo that has to watch a body move over time needs more than a few
+      # frames, so it can ask for them in tests/frames. Everyone else keeps the
+      # cheap default: the budget is paid on every run, including every mutant.
+      local output status n m frames
+      frames="$(test -f "$demo/tests/frames" && tr -cd '0-9' < "$demo/tests/frames")"
+      output="$(mem_capture mem_run_godot "$GODOT" --headless --path "$demo" res://tests/test.tscn --quit-after "${frames:-5}")"
       status=$?
       summary="$(printf '%s\n' "$output" | grep -oE '[0-9]+/[0-9]+ passed' | tail -1)"
       n="${summary%%/*}"
       m="${summary#*/}"; m="${m%% passed}"
-      if [ "$status" -ne 0 ] || [ -z "$summary" ] || [ "$n" != "$m" ]; then
+      # A runtime error abandons the function it happened in, so the
+      # assertions after it never run: the suite prints a smaller n/n passed
+      # and the counts still agree. Four suites were quietly skipping the tail
+      # of a test this way before the check existed.
+      local suite_errors
+      suite_errors="$(printf '%s\n' "$output" | grep -E "$SUITE_ABORT_RE")"
+      if [ "$status" -ne 0 ] || [ -z "$summary" ] || [ "$n" != "$m" ] || [ -n "$suite_errors" ]; then
         detail="tests: ${summary:-no summary}, exit $status"$'\n'"$(printf '%s\n' "$output" | sed 's/^/      | /')"
         failed=1
       fi
@@ -157,19 +193,38 @@ done
 demos=("${valid[@]}")
 [ "${#demos[@]}" -eq 0 ] && { echo "nothing to check"; exit 0; }
 
-JOBS="${JOBS:-$( (command -v nproc >/dev/null && nproc) || echo 4 )}"
+# Concurrency comes from tools/memguard.sh: bounded by free memory as well as
+# cores, halved again if someone else is already running Godot, capped at 8.
+JOBS="${JOBS:-$(mem_safe_jobs)}"
 [ "$JOBS" -gt "${#demos[@]}" ] && JOBS="${#demos[@]}"
 
+# Refuse to start on a machine that is already short of memory.
+mem_guard_preflight || exit 3
+
 RESULT_DIR="$(mktemp -d)"
-trap 'rm -rf "$RESULT_DIR"' EXIT
+mem_guard_install_trap
+trap 'mem_reap_children; rm -rf "$RESULT_DIR"' EXIT
 export GODOT ERROR_RE RUN_SMOKE RUN_LOGIC FORCE_IMPORT RESULT_DIR
 
 echo "Checking ${#demos[@]} demo(s) with $JOBS parallel job(s)…"
+echo "  (each job is a Godot process; set JOBS= to change)"
 
 # Import first (demos that need it), then check. Both fan out; the import phase
 # is a barrier because the checks below depend on its output.
 printf '%s\n' "${demos[@]}" | xargs -P "$JOBS" -I{} "$0" --worker-import {}
-printf '%s\n' "${demos[@]}" | xargs -P "$JOBS" -I{} "$0" --worker-check {}
+mem_guard_ok || exit 4
+
+# Chunked rather than one xargs over everything, so the memory floor is
+# re-checked as the run proceeds and an abort can happen partway instead of only
+# at the end.
+chunk=$(( JOBS * 4 ))
+total="${#demos[@]}"
+offset=0
+while [ "$offset" -lt "$total" ]; do
+  printf '%s\n' "${demos[@]:$offset:$chunk}" | xargs -P "$JOBS" -I{} "$0" --worker-check {}
+  offset=$(( offset + chunk ))
+  mem_guard_ok || { echo "  (checked $offset of $total before aborting)" >&2; break; }
+done
 
 pass=0
 fail=0

@@ -28,3 +28,10 @@ mono_crash.*.json
 #             load its own textures until someone runs an editor/import pass.
 #
 # Both are engine-generated but belong in version control.
+
+# Crash-recovery journal written by tools/mutate.py
+.mutate-journal.json
+
+# Python bytecode from the tools
+__pycache__/
+*.pyc

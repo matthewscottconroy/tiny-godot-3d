@@ -7,6 +7,8 @@ var _fail := 0
 
 func _ready() -> void:
 	test_offset_starts_behind()
+	test_the_camera_sits_on_the_offset_side_of_the_target()
+	test_dragging_down_lifts_the_camera()
 	test_distance_is_respected()
 	test_yaw_orbits_horizontally()
 	test_pitch_clamps_away_from_the_poles()
@@ -30,6 +32,27 @@ func _report() -> void:
 	print(summary)
 	if _fail > 0:
 		push_error(summary)
+
+func test_the_camera_sits_on_the_offset_side_of_the_target() -> void:
+	print("placement")
+	var r := OrbitRig.new()
+	var target := Vector3(2.0, 1.0, -3.0)
+	expect(r.position_for(target).is_equal_approx(target + r.offset()),
+		"the camera sits at the target plus the offset, not mirrored through it")
+	# Default pitch is positive, and positive pitch means looking down on the
+	# target. The first version of the rig had that inverted.
+	expect(r.position_for(target).y > target.y, "and above it while pitch is positive")
+
+func test_dragging_down_lifts_the_camera() -> void:
+	print("look direction")
+	var r := OrbitRig.new()
+	var before := r.pitch
+	r.look(Vector2(0.0, 200.0))
+	expect(r.pitch > before, "dragging down pitches up")
+	expect(r.position_for(Vector3.ZERO).y > 0.0, "so the camera ends up above the target")
+	var raised := r.pitch
+	r.look(Vector2(0.0, -200.0))
+	expect(r.pitch < raised, "and dragging the other way brings it back down")
 
 func _flat() -> OrbitRig:
 	var r := OrbitRig.new()
@@ -115,6 +138,13 @@ func test_movement_is_camera_relative() -> void:
 	r.yaw = PI / 2.0
 	var turned := r.movement_direction(Vector2(0, -1))
 	expect(absf(turned.x) > 0.9, "after a quarter turn, forward is along X instead")
+	r.yaw = 0.0
+	# Strafing has to go the way the key says. Facing -Z, "right" is +X, and a
+	# sign flip here is a demo where D walks you left — which reads as a
+	# controls bug rather than a maths one.
+	var strafe := r.movement_direction(Vector2(1, 0))
+	expect(strafe.x > 0.9, "a right input strafes right, not left")
+	expect(r.movement_direction(Vector2(-1, 0)).x < -0.9, "and a left input, left")
 	expect(is_zero_approx(r.movement_direction(Vector2.ZERO).length()),
 		"no input produces no direction, not a NaN")
 
@@ -129,3 +159,8 @@ func test_pull_in() -> void:
 	expect(blocked.length() >= r.min_distance, "but never closer than the minimum")
 	expect(blocked.normalized().is_equal_approx(r.offset().normalized()),
 		"the direction is unchanged — only the distance moves")
+	# The padding comes off the hit distance, so the camera stops short of the
+	# surface instead of resting against it — near-plane clipping otherwise
+	# shows the inside of whatever was hit.
+	var padded := r.pulled_in(4.0, 0.5)
+	expect(is_equal_approx(padded.length(), 3.5), "the padding is taken off the hit distance")

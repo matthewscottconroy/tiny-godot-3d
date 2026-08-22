@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Weekly, for the jobs too slow to gate a push.
+    - cron: "0 5 * * 1"
 
 jobs:
   docs:
@@ -14,6 +17,16 @@ jobs:
       # never binds still runs fine. See tools/check_docs.py.
       - name: Check documentation structure
         run: ./tools/check_docs.py
+
+      # The API index and the related-demo links are generated from the source,
+      # so a demo added without regenerating them would leave them stale.
+      - name: Check generated indexes are current
+        run: ./tools/build_index.py --check
+
+      # Concept tags are derived the same way: a demo that stops using a
+      # RayCast3D should stop being tagged spatial-query, and this notices.
+      - name: Check concept tags are current
+        run: ./tools/build_tags.py --check
 
   lint:
     runs-on: ubuntu-latest
@@ -37,8 +50,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The collection lost 63 demos to API drift between 4.2 and 4.7 because
-        # nothing ran against a newer engine until long after the fact. Testing
+        # The 2D collection lost 63 demos to API drift between 4.2 and 4.7
+        # because nothing ran against a newer engine until long after the fact.
+        # This one is young enough to avoid that entirely, which is cheap now
+        # and expensive later — 3D APIs move at least as much as 2D ones. Testing
         # the supported floor, the middle, and the current release surfaces that
         # on the day it happens. `primary` picks the version whose result gates
         # the branch; the others are advisory.
@@ -69,7 +84,7 @@ jobs:
           mv ~/godot/Godot_v${{ matrix.godot }}-stable_linux.x86_64 ~/godot/godot
           chmod +x ~/godot/godot
 
-      # Importing 157 cold projects is the most expensive step. The cache is
+      # Importing cold projects is the most expensive step. The cache is
       # keyed on the project sources, so it is reused until a demo changes;
       # run-tests.sh re-imports only the demos whose files are newer than their
       # cache, so a partially stale restore still produces a correct run.
@@ -88,4 +103,71 @@ jobs:
         # independent projects, so the work fans out across the runner's cores.
         run: |
           export PATH="$HOME/godot:$PATH"
-          ./run-tests.sh
+          ./run-tests.sh | tee results-${{ matrix.godot }}.txt
+
+      # The matrix already knows which demos pass on which engine version; this
+      # keeps that instead of throwing it away, so tools/build_compat.py can
+      # publish a per-demo compatibility table.
+      - name: Upload per-version results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.godot }}
+          path: results-${{ matrix.godot }}.txt
+
+  compat:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: results-*
+          path: results
+          merge-multiple: false
+      - name: Build the compatibility table
+        run: ./tools/build_compat.py results
+      # Both files: the table, and the README whose badge is generated with it.
+      # CI does not push, so a maintainer copies these in — which is why the
+      # badge is plain text rather than something only a browser can render.
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility
+          path: |
+            docs/COMPATIBILITY.md
+            README.md
+
+  mutation:
+    # A full sweep takes several minutes, so it does not gate a push.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7.1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL "$url" -o /tmp/godot.zip
+          unzip -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: Measure test integrity
+        # Ratchets against docs/mutation-baseline.json — the score may only go
+        # up. Six mutations per demo rather than the 2D collection's four: the
+        # sweep is small enough here to afford a harder question of each suite.
+        # See docs/TEST_INTEGRITY.md.
+        run: |
+          export PATH="$HOME/godot:$PATH"
+          ./run-tests.sh --smoke-only >/dev/null
+          ./tools/mutate.py --limit 6 --check

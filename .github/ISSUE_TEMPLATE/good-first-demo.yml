@@ -1,0 +1,42 @@
+name: Good first contribution
+description: A small, self-contained piece of work for someone new to the collection
+labels: ["good first demo"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The demos tagged `good-first-demo` in
+        [docs/TAGS.md](../blob/main/docs/TAGS.md) are the ones to point someone
+        at first: short, one idea each, and nothing that needs a concept from
+        another demo. That tag lives with the code and is checked in CI — this
+        label is the view of it for people arriving through the issue tracker.
+
+        [docs/GAPS.md](../blob/main/docs/GAPS.md) lists what the collection does
+        not cover yet, and anything on it is fair game — which here is most
+        things.
+
+  - type: textarea
+    id: work
+    attributes:
+      label: What needs doing
+      description: One piece of work, small enough to finish in a sitting.
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Which demo to read first
+      description: The closest existing demo to use as a model, and why.
+      placeholder: orbit-camera — same shape, and its suite is a good example
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: done
+    attributes:
+      label: What "done" looks like
+      options:
+        - label: "`./run-tests.sh` passes"
+        - label: "`tools/check_docs.py` passes"
+        - label: "`tools/build_index.py --check` and `tools/build_tags.py --check` pass"

@@ -1,0 +1,98 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="1"]
+size = Vector3(20, 0.5, 20)
+
+[sub_resource type="StandardMaterial3D" id="2"]
+albedo_color = Color(0.22, 0.24, 0.27, 1)
+
+[sub_resource type="CapsuleMesh" id="3"]
+radius = 0.5
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="m0"]
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="m1"]
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="m2"]
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="m3"]
+albedo_color = Color(1, 1, 1, 1)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("1")
+material_override = SubResource("2")
+
+[node name="Rig" type="Node3D" parent="."]
+
+[node name="Shaker" type="Node3D" parent="Rig"]
+
+[node name="Camera3D" type="Camera3D" parent="Rig/Shaker"]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 2.5, 9)
+
+[node name="Markers" type="Node3D" parent="."]
+
+[node name="Friend" type="MeshInstance3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1, 0)
+mesh = SubResource("3")
+material_override = SubResource("m0")
+
+[node name="Enemy" type="MeshInstance3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1, 0)
+mesh = SubResource("3")
+material_override = SubResource("m1")
+
+[node name="Neutral" type="MeshInstance3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 0)
+mesh = SubResource("3")
+material_override = SubResource("m2")
+
+[node name="Objective" type="MeshInstance3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1, 0)
+mesh = SubResource("3")
+material_override = SubResource("m3")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TitleLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 784.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+text = "Accessibility"
+
+[node name="OptionList" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 784.0
+offset_bottom = 68.0
+theme_override_font_sizes/font_size = 15
+
+[node name="Subtitle" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 500.0
+offset_right = 784.0
+offset_bottom = 530.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+[node name="StatusLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 560.0
+offset_right = 784.0
+offset_bottom = 584.0
+theme_override_font_sizes/font_size = 14

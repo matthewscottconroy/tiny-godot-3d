@@ -1,0 +1,81 @@
+name: web gallery
+
+# Exports the demos to the web and publishes a playable gallery to GitHub Pages.
+#
+# STATUS: unvalidated. The export pipeline needs Godot's web export templates,
+# which were not available where this was written, so it has never run end to
+# end. It is manual-dispatch only — it cannot break the normal CI — and the
+# first run should be treated as a bring-up exercise rather than a deploy.
+#
+# Before enabling: Settings → Pages → Source → GitHub Actions.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Deploy to GitHub Pages (otherwise just build and upload an artifact)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7.1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and the web export templates
+        run: |
+          mkdir -p ~/godot
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          curl -fsSL "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" -o /tmp/godot.zip
+          unzip -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+          # Templates install to a version-named directory Godot looks in.
+          curl -fsSL "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" -o /tmp/templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates
+          unzip -q -o /tmp/templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+
+      - name: Export demos to the web
+        run: |
+          export PATH="$HOME/godot:$PATH"
+          ./tools/export_web.sh
+
+      - name: Build the landing page
+        run: ./tools/build_web_index.py
+
+      - name: Upload the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-gallery
+          path: build/web
+
+      - name: Package for Pages
+        if: inputs.publish
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    if: inputs.publish
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

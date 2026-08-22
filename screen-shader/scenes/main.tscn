@@ -1,0 +1,90 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Shader" path="res://shaders/glass.gdshader" id="2"]
+
+[sub_resource type="BoxMesh" id="ground_mesh"]
+size = Vector3(20, 0.2, 16)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.3, 0.32, 0.36, 1)
+
+[sub_resource type="ShaderMaterial" id="glass_mat"]
+shader = ExtResource("2")
+shader_parameter/strength = 0.05
+shader_parameter/roughness_blur = 0.0
+shader_parameter/fresnel_power = 5.0
+shader_parameter/tint = Color(0.75, 0.9, 0.95, 1)
+
+[sub_resource type="SphereMesh" id="glass_mesh"]
+radius = 1.1
+height = 2.2
+
+[sub_resource type="BoxMesh" id="prop_mesh"]
+size = Vector3(0.8, 0.8, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="prop_a"]
+albedo_color = Color(0.9, 0.4, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="prop_b"]
+albedo_color = Color(0.35, 0.75, 0.45, 1)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.97, 0.26, 0, -0.26, 0.97, 0, 2.4, 7)
+
+[node name="Light" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707, 0.707, 0, -0.707, 0.707, 0, 8, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+mesh = SubResource("ground_mesh")
+material_override = SubResource("ground_mat")
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Left" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.6, -2.5)
+mesh = SubResource("prop_mesh")
+material_override = SubResource("prop_a")
+
+[node name="Right" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.6, -2.5)
+mesh = SubResource("prop_mesh")
+material_override = SubResource("prop_b")
+
+[node name="Glass" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+mesh = SubResource("glass_mesh")
+material_override = SubResource("glass_mat")
+
+[node name="SecondPane" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 2.6, 1.0, -1.0)
+mesh = SubResource("glass_mesh")
+material_override = SubResource("glass_mat")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TitleLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 1000.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+
+[node name="ReadoutLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 1000.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 15
+
+[node name="StatusLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 560.0
+offset_right = 1000.0
+offset_bottom = 584.0
+theme_override_font_sizes/font_size = 14

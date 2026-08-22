@@ -1,11 +1,18 @@
 extends Node
 
-# Drives the real CharacterMotor from scripts/motor.gd.
+# Drives the real CharacterMotor from scripts/motor.gd, and then the real body
+# from scripts/player.gd with synthesised input.
+#
+# mutate-driver: skip — the scene is instantiated to drive player.gd with real input, not to test main.gd
 
 var _pass := 0
 var _fail := 0
+var _frame := 0
+var _scene: Node3D = null
+var _start := Vector3.ZERO
 
 func _ready() -> void:
+	test_a_fresh_motor_is_airborne()
 	test_gravity_pulls_down()
 	test_landing_zeroes_fall()
 	test_jump_from_floor()
@@ -16,7 +23,6 @@ func _ready() -> void:
 	test_acceleration_is_gradual()
 	test_air_control_is_weaker()
 	test_reset()
-	_report()
 
 func expect(cond: bool, label: String) -> void:
 	if cond:
@@ -34,6 +40,16 @@ func _report() -> void:
 
 const STEP := 1.0 / 60.0
 const FORWARD := Vector3(0, 0, -1)
+
+func test_a_fresh_motor_is_airborne() -> void:
+	print("initial state")
+	var m := CharacterMotor.new()
+	expect(not m.can_jump(false), "a motor that has never touched the ground cannot jump")
+	# The motor arms coyote time on the frame it leaves the floor. If it starts
+	# out believing it *was* on the floor, the first airborne frame arms the
+	# window and a character spawned in mid-air gets one free jump.
+	m.step(Vector3.ZERO, false, false, false, STEP)
+	expect(not m.can_jump(false), "and the first airborne frame does not grant one")
 
 func test_gravity_pulls_down() -> void:
 	print("gravity")
@@ -126,3 +142,52 @@ func test_reset() -> void:
 	m.reset()
 	expect(m.velocity == Vector3.ZERO, "velocity is cleared")
 	expect(not m.can_jump(false), "and so is the coyote window")
+
+	# Reset has to forget that we were ever on the floor, not just clear the
+	# window. The motor arms coyote time on the frame it *leaves* the ground, so
+	# a motor that still believes it was grounded re-arms it on the very next
+	# airborne frame — a free mid-air jump after every respawn.
+	var grounded := CharacterMotor.new()
+	grounded.step(Vector3.ZERO, false, false, true, STEP)
+	grounded.reset()
+	grounded.step(Vector3.ZERO, false, false, false, STEP)
+	expect(not grounded.can_jump(false), "and it does not re-arm on the next airborne frame")
+
+# --- the real body ---------------------------------------------------------
+#
+# The motor is pure maths and is tested above. player.gd is the other half: it
+# reads Input, calls move_and_slide(), and hands the result back. That needs a
+# scene and an input device — so the suite makes one, by pressing the actions
+# itself.
+
+func _physics_process(_delta: float) -> void:
+	_frame += 1
+	match _frame:
+		1:
+			print("the real body")
+			_scene = load("res://scenes/main.tscn").instantiate()
+			add_child(_scene)
+		3:
+			_start = (_scene.get_node("Player") as Node3D).global_position
+			# Input.action_press works without a window or a keyboard: it sets
+			# the action's strength directly, which is what Input.get_vector
+			# reads.
+			Input.action_press(&"ui_up")
+		30:
+			var player: Node3D = _scene.get_node("Player")
+			var moved := _start.distance_to(player.global_position)
+			expect(moved > 0.3, "holding a direction moves the body (%.2f m)" % moved)
+			expect(player.global_position.z < _start.z,
+				"in the direction that was pressed, not the opposite one")
+			Input.action_release(&"ui_up")
+			_resting_at = player.global_position
+		45:
+			var player: Node3D = _scene.get_node("Player")
+			# It decelerates rather than stopping dead, so the check is that it
+			# is settling, not that it froze.
+			var drift := _resting_at.distance_to(player.global_position)
+			expect(drift < 1.0, "releasing it brings the body to rest (%.2f m of drift)" % drift)
+			expect(player.is_on_floor(), "and it is still standing on the floor")
+			_report()
+
+var _resting_at := Vector3.ZERO

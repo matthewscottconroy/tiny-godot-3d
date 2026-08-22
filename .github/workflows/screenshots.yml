@@ -1,0 +1,85 @@
+name: screenshots
+
+# Capturing needs a real framebuffer — Godot's --headless renderer is a dummy
+# driver that cannot produce an image — so this installs xvfb and runs each demo
+# under a virtual X server.
+#
+# Manual/scheduled rather than per-push: it boots every demo with rendering on,
+# which is far heavier than the headless test run, and screenshots only need
+# refreshing when a demo's visuals actually change.
+#
+# A 3D still is a weaker artefact than a 2D one — it flattens the thing it is
+# meant to show — so MOTION=1 and the short WebP loops matter more here. That
+# needs ffmpeg, which the runner already has.
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit the refreshed screenshots back to the branch"
+        type: boolean
+        default: false
+  schedule:
+    # Weekly, so the gallery cannot drift far from the demos.
+    - cron: "0 4 * * 1"
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7.1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install a virtual display
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL "$url" -o /tmp/godot.zip
+          unzip -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: Import projects
+        run: |
+          export PATH="$HOME/godot:$PATH"
+          ./run-tests.sh --smoke-only
+
+      - name: Capture screenshots
+        run: |
+          export PATH="$HOME/godot:$PATH"
+          ./tools/screenshots.sh
+
+      - name: Build the gallery
+        run: ./tools/build_gallery.py
+
+      # Uploaded either way, so a run can be inspected before anything is
+      # committed — useful the first time, when the capture settings (which
+      # frame to keep) may need tuning per demo.
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: |
+            docs/img/
+            docs/GALLERY.md
+
+      - name: Commit
+        if: inputs.commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/img docs/GALLERY.md
+          git diff --staged --quiet || git commit -m "Refresh demo screenshots and gallery"
+          git push

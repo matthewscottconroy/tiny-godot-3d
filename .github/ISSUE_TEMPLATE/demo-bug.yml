@@ -1,0 +1,28 @@
+name: A demo is wrong
+description: A demo does not run, or teaches something incorrect
+labels: ["bug"]
+body:
+  - type: input
+    id: demo
+    attributes:
+      label: Which demo
+      placeholder: "orbit-camera"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Godot version
+      placeholder: "4.7.1"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: >
+        Paste the output of `./run-tests.sh <demo>` if it fails. If the demo runs
+        but is wrong, say what you expected — a demo that runs and teaches the
+        wrong thing is the more serious bug.
+    validations:
+      required: true
