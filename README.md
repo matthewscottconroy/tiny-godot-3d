@@ -1,16 +1,17 @@
 # Tiny Godot 3D
 
-A collection of **54 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
+A collection of **58 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
 
-Built for **Godot 4.7** (Forward+). Every demo is **3D** — 2D lives in its own
+Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7 — every
+demo passes on all three. Every demo is **3D** — 2D lives in its own
 collection, [tiny-godot-games](https://github.com/matthewscottconroy/tiny-godot-games), which covers it in 165
 demos and shares this repository's conventions and tooling.
 
 <!-- compat-badge -->
-**Godot 4.7** — 54/54 demos passing. [Full table](docs/COMPATIBILITY.md)
+**Godot 4.5.1 – 4.7** — 58/58 demos passing. [Full table](docs/COMPATIBILITY.md)
 <!-- /compat-badge -->
 
-> **Status: growing.** Fifty-four demos so far. The harness, conventions,
+> **Status: growing.** Fifty-eight demos so far. The harness, conventions,
 > tooling and CI are in place, so the shape is settled — what is missing is
 > breadth. The gaps are enumerated in [docs/GAPS.md](docs/GAPS.md), and anything
 > on that list is fair game to contribute.
@@ -126,6 +127,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [camera-framing](camera-framing) | A camera that keeps several things on screen at once — the RTS and party-game problem, as arithmetic. |
 | [split-screen-3d](split-screen-3d) | Two players, two viewports, one world — and the shared World3D that makes the second view show anything at all. |
 | [portal-3d](portal-3d) | A portal you can see through and walk through, and the transform that puts the second camera in the right place. |
+| [camera-clipping](camera-clipping) | Why the wall you stand against disappears, and what the near plane costs to fix it. |
 
 ### ⚙️ Physics & Queries
 | Demo | Description |
@@ -134,6 +136,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [raycast-picking](raycast-picking) | Turning a mouse position into a world ray, and asking the physics space what it hit. |
 | [area-trigger-3d](area-trigger-3d) | Area3D triggers that fire on the transition rather than per body, with collision layers deciding what counts. |
 | [joints-3d](joints-3d) | A HingeJoint3D door with limits and a motor, and a PinJoint3D chain — physics constraints instead of animation. |
+| [six-dof-joint](six-dof-joint) | The joint that does everything, and how to say which of its six axes you meant. |
 | [terrain-collision](terrain-collision) | A HeightMapShape3D that lines up with the mesh it came from — and what happens when the spacing does not match. |
 | [continuous-collision](continuous-collision) | A fast projectile that goes straight through a wall, and the three ways to stop it. |
 | [vehicle-3d](vehicle-3d) | A VehicleBody3D that drives, the arithmetic that keeps it drivable, and the sign that catches everyone. |
@@ -154,6 +157,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 |------|-------------|
 | [procedural-mesh](procedural-mesh) | Building geometry with `SurfaceTool`: vertices, winding order, indices, and normals. |
 | [noise-terrain](noise-terrain) | A heightmap from FastNoiseLite turned into a mesh, with slope-shaded regions and a seed you can change. |
+| [terrain-splatting](terrain-splatting) | Texturing terrain by slope and height, with weights that add up and edges that do not band. |
 | [multimesh](multimesh) | Ten thousand instances in one draw call with MultiMeshInstance3D, and a distance cull that costs nothing. |
 
 ### 💡 Rendering & Light
@@ -177,6 +181,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [tween-3d](tween-3d) | Tween or AnimationPlayer — what each is for, and the two tweens that end up fighting over one property. |
 | [skeleton-3d](skeleton-3d) | Building a Skeleton3D in code and posing its bones — local poses, rests, and what BoneAttachment3D is for. |
 | [two-bone-ik](two-bone-ik) | Two-bone inverse kinematics: where the knee goes when the foot is planted, and what happens when it cannot reach. |
+| [skeleton-modifier](skeleton-modifier) | The supported place to change a pose after the animation has set it — and why _process() is not it. |
 | [audio-3d](audio-3d) | Positional audio with AudioStreamPlayer3D, and a hearing model the game logic can share with it. |
 | [audio-buses](audio-buses) | Audio buses built at runtime: sliders that are decibels, a mute that is not a volume, and a reverb you walk into. |
 
@@ -224,4 +229,4 @@ than translating the 2D ones.
 
 ---
 
-*54 demos. Each teaches one thing, completely.*
+*58 demos. Each teaches one thing, completely.*

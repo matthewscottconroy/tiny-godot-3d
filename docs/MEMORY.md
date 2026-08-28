@@ -19,7 +19,7 @@ tools/leakcheck.sh                    # every demo
 VERBOSE=1 tools/leakcheck.sh <demo>   # show clean results too
 ```
 
-**Current state: 55 projects, all clean, two reports allowlisted as engine-side.**
+**Current state: 59 projects, all clean, two reports allowlisted as engine-side.**
 
 The allowlist is the part to keep honest: every entry has to be justified with a
 reproduction in a scene containing none of the demo's code, and an allowlist that

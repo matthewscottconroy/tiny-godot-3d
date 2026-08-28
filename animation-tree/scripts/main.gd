@@ -61,19 +61,39 @@ func _build_tree() -> void:
 	space.min_space = 0.0
 	space.max_space = 2.0
 	var points := {"idle": 0.0, "walk": 1.0, "run": 2.0}
+	var named_points := _add_blend_point_takes_a_name(space)
 	for clip_name in points:
 		var node := AnimationNodeAnimation.new()
 		node.animation = clip_name
-		# The fourth argument is the point's name. Leaving it out makes the point
-		# referenced by index, which Godot warns about — indices move when
-		# points are added or removed, and a parameter path built from one goes
-		# quietly stale.
-		space.add_blend_point(node, float(points[clip_name]), -1, clip_name)
+		var args: Array = [node, float(points[clip_name]), -1]
+		if named_points:
+			# Naming a blend point is a 4.7 addition. It is worth having — an
+			# unnamed point is referenced by index, indices move when points are
+			# added or removed, and a parameter path built from one goes quietly
+			# stale — and 4.7 warns when the name is left out.
+			args.append(clip_name)
+		# `callv`, not a direct call: passing four arguments to a three-argument
+		# method is a *parse* error, so a static call would stop this demo
+		# loading at all on 4.5 and 4.6 rather than skipping the extra argument.
+		# Setting the name afterwards does not work either — the warning is
+		# emitted by `add_blend_point()` itself.
+		space.callv(&"add_blend_point", args)
 	_tree.tree_root = space
 	_tree.anim_player = _tree.get_path_to(_player)
 	# Nothing plays until the tree is active, and an inactive tree is the
 	# commonest reason a correctly built one does nothing at all.
 	_tree.active = true
+
+## Does this engine's `add_blend_point()` take a name?
+##
+## Asked of the method list rather than of the version number: a feature check
+## keeps working across the release where it was backported, and does not need
+## updating when the next version arrives.
+static func _add_blend_point_takes_a_name(space: AnimationNodeBlendSpace1D) -> bool:
+	for method in space.get_method_list():
+		if String(method["name"]) == "add_blend_point":
+			return (method["args"] as Array).size() >= 4
+	return false
 
 func _process(delta: float) -> void:
 	# The pawn accelerates toward the speed asked for, so the blend has

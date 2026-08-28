@@ -97,6 +97,23 @@ The test job runs against several Godot versions. Only the current release gates
 the branch; the others are advisory early warning, because this collection has
 been broken by engine API drift before and nobody noticed for a long time.
 
+**Write for the floor, and feature-check rather than version-check.** The first
+time the whole collection was run against 4.5.1 and 4.6.1 it turned up exactly
+one break: `AnimationNodeBlendSpace1D.add_blend_point()` gained a fourth
+argument in 4.7, and passing it is a *parse* error on anything older — so the
+demo did not fail a test, it failed to load. Two things are worth copying from
+the fix in `animation-tree`:
+
+- Ask the engine what it supports, not what version it is. A method's argument
+  count comes out of `get_method_list()`, and a check written that way keeps
+  working across the release where a feature is backported.
+- Build the call with `callv()` when the arity differs. A static call with the
+  wrong number of arguments cannot be guarded by an `if`, because it fails
+  before the `if` runs.
+
+Doing neither is also a defensible choice — but then say so in the demo's
+README, and expect the compatibility table to grow a row that is not all green.
+
 `gdformat` is deliberately **not** run. It would reformat almost every file in
 the repo, collapsing the aligned constant tables that make the demos readable.
 Indentation consistency is covered by gdlint's `mixed-tabs-and-spaces` instead.

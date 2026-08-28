@@ -27,6 +27,9 @@ func _ready() -> void:
 	test_bending_to_the_exact_opposite()
 	test_bending_with_nothing_to_bend_toward()
 	test_curling_moves_the_tip_toward_the_target()
+	test_the_curl_weights_rise_along_the_chain()
+	test_the_falloff_decides_where_it_bends()
+	test_curling_nothing()
 	test_relaxing_puts_it_back()
 	test_the_tip_of_a_bone()
 
@@ -132,6 +135,68 @@ func test_bending_with_nothing_to_bend_toward() -> void:
 		Quaternion.IDENTITY), "a zero-length direction bends nothing")
 	expect(SkeletonRig.bend_toward(Vector3.UP, Vector3.ZERO, 1.0).is_equal_approx(
 		Quaternion.IDENTITY), "at either end")
+
+func test_the_curl_weights_rise_along_the_chain() -> void:
+	print("where the bend goes")
+	var skeleton := _skeleton()
+	var bones := SkeletonRig.build_chain(skeleton, 5, LENGTH)
+	SkeletonRig.curl(skeleton, bones, Vector3(2.0, 1.0, 0.0), 0.9)
+	var root := skeleton.get_bone_pose_rotation(bones[0]).get_angle()
+	var tip := skeleton.get_bone_pose_rotation(bones[4]).get_angle()
+	# Every bone bends, and the ones nearer the tip bend more. The weight is a
+	# ramp along the chain, and a ramp that starts below zero at the root — one
+	# index out — bends the first bone backwards.
+	expect(root > 0.0, "the root bone bends a little (%.3f rad)" % root)
+	expect(tip > root, "and the tip bends more than the root (%.3f > %.3f)" % [tip, root])
+
+	# And the ramp itself, which is the part with a rule in it — the joint angles
+	# above also depend on where each bone already points.
+	var previous := -1.0
+	var rising := true
+	for i in 5:
+		var weight := SkeletonRig.curl_weight(i, 5, 0.9)
+		if weight <= previous:
+			rising = false
+		previous = weight
+	expect(rising, "the weight rises at every step from root to tip")
+	expect(SkeletonRig.curl_weight(0, 5, 0.9) > 0.0,
+		"the root gets a share of the bend rather than none, or less than none")
+	expect(is_equal_approx(SkeletonRig.curl_weight(4, 5, 0.9), 0.9),
+		"and the tip gets the full strength")
+	expect(is_zero_approx(SkeletonRig.curl_weight(0, 0, 0.9)),
+		"a chain of no bones weights nothing rather than dividing by zero")
+
+func test_the_falloff_decides_where_it_bends() -> void:
+	print("falloff")
+	# Below one puts most of the bend near the tip — a tentacle. Above one puts
+	# it at the root — an arm reaching.
+	var tentacle := _skeleton()
+	var tentacle_bones := SkeletonRig.build_chain(tentacle, 5, LENGTH)
+	SkeletonRig.curl(tentacle, tentacle_bones, Vector3(2.0, 1.0, 0.0), 0.9, 3.0)
+	var arm := _skeleton()
+	var arm_bones := SkeletonRig.build_chain(arm, 5, LENGTH)
+	SkeletonRig.curl(arm, arm_bones, Vector3(2.0, 1.0, 0.0), 0.9, 0.4)
+	expect(arm.get_bone_pose_rotation(arm_bones[0]).get_angle()
+		> tentacle.get_bone_pose_rotation(tentacle_bones[0]).get_angle(),
+		"a low falloff bends the root more than a high one does")
+	expect(SkeletonRig.curl_weight(0, 5, 0.9, 0.4) > SkeletonRig.curl_weight(0, 5, 0.9, 3.0),
+		"which is the ramp giving the root more of the bend")
+	expect(is_equal_approx(SkeletonRig.curl_weight(4, 5, 0.9, 0.4),
+		SkeletonRig.curl_weight(4, 5, 0.9, 3.0)),
+		"while the tip gets the full strength whatever the falloff is")
+
+func test_curling_nothing() -> void:
+	print("curling nothing")
+	var skeleton := _skeleton()
+	var bones := SkeletonRig.build_chain(skeleton, 3, LENGTH)
+	# Both guards, separately. A rig built from data can hand this an empty bone
+	# list or a skeleton that has not been created yet, and neither may crash.
+	SkeletonRig.curl(skeleton, PackedInt32Array(), Vector3.ONE, 0.9)
+	expect(is_zero_approx(skeleton.get_bone_pose_rotation(bones[0]).get_angle()),
+		"curling an empty bone list changes nothing")
+	SkeletonRig.curl(null, bones, Vector3.ONE, 0.9)
+	expect(is_zero_approx(skeleton.get_bone_pose_rotation(bones[0]).get_angle()),
+		"and curling a skeleton that is not there does nothing rather than erroring")
 
 func test_curling_moves_the_tip_toward_the_target() -> void:
 	print("curling")

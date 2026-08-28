@@ -69,6 +69,15 @@ by how fast the character is really moving relative to how fast the clip was
 authored for. Clamped, because a sprint at 3× playback is a blur rather than a
 run.
 
+**Naming a blend point is 4.7-only, and the demo runs on 4.5.1.**
+`add_blend_point()` gained a fourth argument — the point's name — in 4.7, and
+4.7 warns when it is left out. Passing it on 4.6 is a *parse* error, so the demo
+would not load at all rather than degrade. The fix asks the engine how many
+arguments the method takes and builds the call with `callv()`; a static call
+cannot be guarded by an `if`, because it fails before the `if` runs. Setting the
+name afterwards does not help either — the warning comes from
+`add_blend_point()` itself.
+
 ## Key Godot APIs
 
 | API | Purpose |

@@ -17,22 +17,22 @@ cover that yet. See [known gaps](GAPS.md).
 
 | Tag | Demos | What it means |
 |-----|-------|---------------|
-| `physics` | 16 | Bodies, areas and collision — the engine moving things for you. |
-| `spatial-query` | 4 | Asks the world what is there — rays, shapes, and picking. |
-| `mesh` | 15 | Builds or manipulates geometry rather than loading it. |
+| `physics` | 18 | Bodies, areas and collision — the engine moving things for you. |
+| `spatial-query` | 5 | Asks the world what is there — rays, shapes, and picking. |
+| `mesh` | 17 | Builds or manipulates geometry rather than loading it. |
 | `lighting` | 4 | Puts light, shadow or atmosphere in the scene deliberately. |
-| `camera` | 18 | The camera is the subject, not just the way you see the subject. |
+| `camera` | 19 | The camera is the subject, not just the way you see the subject. |
 | `navigation` | 2 | Moves an agent through the world by asking for a path. |
-| `animation` | 6 | Plays, blends or drives animation rather than moving transforms by hand. |
-| `shader` | 2 | Carries a shader, whether written in a file or built in code. |
+| `animation` | 7 | Plays, blends or drives animation rather than moving transforms by hand. |
+| `shader` | 3 | Carries a shader, whether written in a file or built in code. |
 | `audio` | 2 | Makes a sound, or routes one. |
-| `ui` | 54 | Built out of Control nodes rather than 3D nodes. |
-| `procedural` | 7 | Generates its own content rather than loading it. |
+| `ui` | 58 | Built out of Control nodes rather than 3D nodes. |
+| `procedural` | 8 | Generates its own content rather than loading it. |
 | `persistence` | 2 | Reads or writes something that outlives the run. |
 | `signals` | 7 | Declares a signal of its own — the loose-coupling lesson. |
-| `component` | 54 | Ships a class_name you can lift into another project. |
+| `component` | 58 | Ships a class_name you can lift into another project. |
 | `tool-script` | 1 | Runs inside the editor as well as the game. |
-| `shows-its-working` | 54 | Puts the state it is explaining on screen, not just the result. |
+| `shows-its-working` | 58 | Puts the state it is explaining on screen, not just the result. |
 | `needs-gamepad` | 1 | Wants a controller plugged in to show its subject. |
 | `needs-mouse-capture` | 3 | Takes the cursor, so it wants a real window rather than a screenshot. |
 | `needs-network` | 1 | Talks to something outside the machine. |
@@ -40,15 +40,15 @@ cover that yet. See [known gaps](GAPS.md).
 
 ## physics
 
-[area-trigger-3d](../area-trigger-3d), [audio-buses](../audio-buses), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [continuous-collision](../continuous-collision), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [joints-3d](../joints-3d), [navigation-3d](../navigation-3d), [ragdoll-3d](../ragdoll-3d), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [shape-cast-3d](../shape-cast-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [vehicle-3d](../vehicle-3d)
+[area-trigger-3d](../area-trigger-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [continuous-collision](../continuous-collision), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [joints-3d](../joints-3d), [navigation-3d](../navigation-3d), [ragdoll-3d](../ragdoll-3d), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [shape-cast-3d](../shape-cast-3d), [six-dof-joint](../six-dof-joint), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [vehicle-3d](../vehicle-3d)
 
 ## spatial-query
 
-[continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking), [shape-cast-3d](../shape-cast-3d), [two-bone-ik](../two-bone-ik)
+[camera-clipping](../camera-clipping), [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking), [shape-cast-3d](../shape-cast-3d), [two-bone-ik](../two-bone-ik)
 
 ## mesh
 
-[continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [editor-tool-3d](../editor-tool-3d), [grid-map](../grid-map), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lod-and-decals](../lod-and-decals), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [procedural-mesh](../procedural-mesh), [rigid-body-3d](../rigid-body-3d), [terrain-collision](../terrain-collision)
+[continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [editor-tool-3d](../editor-tool-3d), [grid-map](../grid-map), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lod-and-decals](../lod-and-decals), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [procedural-mesh](../procedural-mesh), [rigid-body-3d](../rigid-body-3d), [six-dof-joint](../six-dof-joint), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting)
 
 ## lighting
 
@@ -56,7 +56,7 @@ cover that yet. See [known gaps](GAPS.md).
 
 ## camera
 
-[camera-framing](../camera-framing), [cinematic-camera](../cinematic-camera), [csg-blockout](../csg-blockout), [gamepad-3d](../gamepad-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [multimesh](../multimesh), [noise-terrain](../noise-terrain), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [screen-shader](../screen-shader), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [transparency-3d](../transparency-3d), [volumetric-fog](../volumetric-fog)
+[camera-clipping](../camera-clipping), [camera-framing](../camera-framing), [cinematic-camera](../cinematic-camera), [csg-blockout](../csg-blockout), [gamepad-3d](../gamepad-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [multimesh](../multimesh), [noise-terrain](../noise-terrain), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [screen-shader](../screen-shader), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [transparency-3d](../transparency-3d), [volumetric-fog](../volumetric-fog)
 
 ## navigation
 
@@ -64,11 +64,11 @@ cover that yet. See [known gaps](GAPS.md).
 
 ## animation
 
-[animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [ragdoll-3d](../ragdoll-3d), [root-motion](../root-motion), [skeleton-3d](../skeleton-3d), [tween-3d](../tween-3d)
+[animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [ragdoll-3d](../ragdoll-3d), [root-motion](../root-motion), [skeleton-3d](../skeleton-3d), [skeleton-modifier](../skeleton-modifier), [tween-3d](../tween-3d)
 
 ## shader
 
-[screen-shader](../screen-shader), [wave-shader](../wave-shader)
+[screen-shader](../screen-shader), [terrain-splatting](../terrain-splatting), [wave-shader](../wave-shader)
 
 ## audio
 
@@ -76,11 +76,11 @@ cover that yet. See [known gaps](GAPS.md).
 
 ## ui
 
-[accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [cinematic-camera](../cinematic-camera), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [environment-fog](../environment-fog), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [grid-map](../grid-map), [input-remapping](../input-remapping), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [menu-navigation](../menu-navigation), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [object-pool-3d](../object-pool-3d), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [procedural-mesh](../procedural-mesh), [ragdoll-3d](../ragdoll-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [save-load-3d](../save-load-3d), [screen-shader](../screen-shader), [shape-cast-3d](../shape-cast-3d), [skeleton-3d](../skeleton-3d), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [threaded-loading](../threaded-loading), [transparency-3d](../transparency-3d), [tween-3d](../tween-3d), [two-bone-ik](../two-bone-ik), [vehicle-3d](../vehicle-3d), [volumetric-fog](../volumetric-fog), [wave-shader](../wave-shader)
+[accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [cinematic-camera](../cinematic-camera), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [environment-fog](../environment-fog), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [grid-map](../grid-map), [input-remapping](../input-remapping), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [menu-navigation](../menu-navigation), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [object-pool-3d](../object-pool-3d), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [procedural-mesh](../procedural-mesh), [ragdoll-3d](../ragdoll-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [save-load-3d](../save-load-3d), [screen-shader](../screen-shader), [shape-cast-3d](../shape-cast-3d), [six-dof-joint](../six-dof-joint), [skeleton-3d](../skeleton-3d), [skeleton-modifier](../skeleton-modifier), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting), [threaded-loading](../threaded-loading), [transparency-3d](../transparency-3d), [tween-3d](../tween-3d), [two-bone-ik](../two-bone-ik), [vehicle-3d](../vehicle-3d), [volumetric-fog](../volumetric-fog), [wave-shader](../wave-shader)
 
 ## procedural
 
-[accessibility-3d](../accessibility-3d), [camera-shake-3d](../camera-shake-3d), [level-streaming](../level-streaming), [multimesh](../multimesh), [noise-terrain](../noise-terrain), [save-load-3d](../save-load-3d), [terrain-collision](../terrain-collision)
+[accessibility-3d](../accessibility-3d), [camera-shake-3d](../camera-shake-3d), [level-streaming](../level-streaming), [multimesh](../multimesh), [noise-terrain](../noise-terrain), [save-load-3d](../save-load-3d), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting)
 
 ## persistence
 
@@ -92,7 +92,7 @@ cover that yet. See [known gaps](GAPS.md).
 
 ## component
 
-[accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [cinematic-camera](../cinematic-camera), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [environment-fog](../environment-fog), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [grid-map](../grid-map), [input-remapping](../input-remapping), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [menu-navigation](../menu-navigation), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [object-pool-3d](../object-pool-3d), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [procedural-mesh](../procedural-mesh), [ragdoll-3d](../ragdoll-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [save-load-3d](../save-load-3d), [screen-shader](../screen-shader), [shape-cast-3d](../shape-cast-3d), [skeleton-3d](../skeleton-3d), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [threaded-loading](../threaded-loading), [transparency-3d](../transparency-3d), [tween-3d](../tween-3d), [two-bone-ik](../two-bone-ik), [vehicle-3d](../vehicle-3d), [volumetric-fog](../volumetric-fog), [wave-shader](../wave-shader)
+[accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [cinematic-camera](../cinematic-camera), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [environment-fog](../environment-fog), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [grid-map](../grid-map), [input-remapping](../input-remapping), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [menu-navigation](../menu-navigation), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [object-pool-3d](../object-pool-3d), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [procedural-mesh](../procedural-mesh), [ragdoll-3d](../ragdoll-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [save-load-3d](../save-load-3d), [screen-shader](../screen-shader), [shape-cast-3d](../shape-cast-3d), [six-dof-joint](../six-dof-joint), [skeleton-3d](../skeleton-3d), [skeleton-modifier](../skeleton-modifier), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting), [threaded-loading](../threaded-loading), [transparency-3d](../transparency-3d), [tween-3d](../tween-3d), [two-bone-ik](../two-bone-ik), [vehicle-3d](../vehicle-3d), [volumetric-fog](../volumetric-fog), [wave-shader](../wave-shader)
 
 ## tool-script
 
@@ -100,7 +100,7 @@ cover that yet. See [known gaps](GAPS.md).
 
 ## shows-its-working
 
-[accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [cinematic-camera](../cinematic-camera), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [environment-fog](../environment-fog), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [grid-map](../grid-map), [input-remapping](../input-remapping), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [menu-navigation](../menu-navigation), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [object-pool-3d](../object-pool-3d), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [procedural-mesh](../procedural-mesh), [ragdoll-3d](../ragdoll-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [save-load-3d](../save-load-3d), [screen-shader](../screen-shader), [shape-cast-3d](../shape-cast-3d), [skeleton-3d](../skeleton-3d), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [threaded-loading](../threaded-loading), [transparency-3d](../transparency-3d), [tween-3d](../tween-3d), [two-bone-ik](../two-bone-ik), [vehicle-3d](../vehicle-3d), [volumetric-fog](../volumetric-fog), [wave-shader](../wave-shader)
+[accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [cinematic-camera](../cinematic-camera), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [environment-fog](../environment-fog), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [grid-map](../grid-map), [input-remapping](../input-remapping), [joints-3d](../joints-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [menu-navigation](../menu-navigation), [multimesh](../multimesh), [multiplayer-3d](../multiplayer-3d), [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle), [noise-terrain](../noise-terrain), [object-pool-3d](../object-pool-3d), [orbit-camera](../orbit-camera), [portal-3d](../portal-3d), [procedural-mesh](../procedural-mesh), [ragdoll-3d](../ragdoll-3d), [raycast-picking](../raycast-picking), [render-to-texture](../render-to-texture), [rigid-body-3d](../rigid-body-3d), [root-motion](../root-motion), [save-load-3d](../save-load-3d), [screen-shader](../screen-shader), [shape-cast-3d](../shape-cast-3d), [six-dof-joint](../six-dof-joint), [skeleton-3d](../skeleton-3d), [skeleton-modifier](../skeleton-modifier), [split-screen-3d](../split-screen-3d), [spring-arm-camera](../spring-arm-camera), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting), [threaded-loading](../threaded-loading), [transparency-3d](../transparency-3d), [tween-3d](../tween-3d), [two-bone-ik](../two-bone-ik), [vehicle-3d](../vehicle-3d), [volumetric-fog](../volumetric-fog), [wave-shader](../wave-shader)
 
 ## needs-gamepad
 

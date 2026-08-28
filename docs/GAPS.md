@@ -15,8 +15,6 @@ example.
 
 ## Physics
 
-- **`Generic6DOFJoint3D`** — the joint that does everything, and the axes you
-  have to configure to get there
 - **Continuous collision for a character** — the same tunnelling as
   [continuous-collision](../continuous-collision), but for a `CharacterBody3D`
   falling through a floor
@@ -28,16 +26,17 @@ example.
 
 - **Recursive portals** — [portal-3d](../portal-3d) draws one level; two portals
   that can see each other need a budget and an oblique near plane
-- **Camera collision for a first-person view** — the near plane clipping through
-  a wall the player is standing against
+- **Camera shake that respects walls** — combining the offset from
+  [camera-shake-3d](../camera-shake-3d) with the clearance
+  [camera-clipping](../camera-clipping) needs, without fighting
 
 ## Level building
 
 - **Streaming the scenes themselves** — [level-streaming](../level-streaming)
   decides *which* chunks; loading them off the main thread with
   [threaded-loading](../threaded-loading) is the other half
-- **Terrain texturing** — splatting by slope and height over the collider
-  [terrain-collision](../terrain-collision) already lines up
+- **Triplanar mapping** — the step past [terrain-splatting](../terrain-splatting):
+  textures on a cliff face that are not stretched vertically
 
 ## Rendering
 
@@ -46,8 +45,9 @@ example.
 
 ## Animation
 
-- **`SkeletonModifier3D`** — the supported place to hang procedural pose changes,
-  and how it sits next to an `AnimationTree`
+- **Stacked modifiers** — a spine lean and a head-look on the same skeleton,
+  and the tree order that decides which reads the other's work, past the single
+  modifier in [skeleton-modifier](../skeleton-modifier)
 - **Root motion with rotation** — `get_root_motion_rotation()`, and a turn that
   belongs to the clip as well as the step
 

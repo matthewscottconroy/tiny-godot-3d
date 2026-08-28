@@ -11,6 +11,11 @@ ones where you are looking for *the* example rather than *an* example.
 | API | Demo |
 |-----|------|
 | `AccessibilityOptions.lightness_gap()` | [accessibility-3d](../accessibility-3d) |
+| `AimConstraint.aim()` | [skeleton-modifier](../skeleton-modifier) |
+| `AimConstraint.aim_within()` | [skeleton-modifier](../skeleton-modifier) |
+| `AimConstraint.blended()` | [skeleton-modifier](../skeleton-modifier) |
+| `AimConstraint.fade()` | [skeleton-modifier](../skeleton-modifier) |
+| `AimConstraint.within_reach()` | [skeleton-modifier](../skeleton-modifier) |
 | `AlphaSorter.back_to_front()` | [transparency-3d](../transparency-3d) |
 | `AlphaSorter.depth_ranges_overlap()` | [transparency-3d](../transparency-3d) |
 | `AlphaSorter.priorities()` | [transparency-3d](../transparency-3d) |
@@ -47,6 +52,11 @@ ones where you are looking for *the* example rather than *an* example.
 | `Crates.get_children()` | [character-push](../character-push) |
 | `Decal` | [lod-and-decals](../lod-and-decals) |
 | `DirAccess.remove_absolute()` | [save-load-3d](../save-load-3d) |
+| `DofSpec.ball()` | [six-dof-joint](../six-dof-joint) |
+| `DofSpec.door()` | [six-dof-joint](../six-dof-joint) |
+| `DofSpec.drawer()` | [six-dof-joint](../six-dof-joint) |
+| `DofSpec.shoulder()` | [six-dof-joint](../six-dof-joint) |
+| `DofSpec.unconstrained()` | [six-dof-joint](../six-dof-joint) |
 | `Drivetrain.airborne()` | [vehicle-3d](../vehicle-3d) |
 | `Drivetrain.forward_speed()` | [vehicle-3d](../vehicle-3d) |
 | `DropStack.impulse_with_lift()` | [rigid-body-3d](../rigid-body-3d) |
@@ -80,6 +90,7 @@ ones where you are looking for *the* example rather than *an* example.
 | `Input.get_joy_axis()` | [gamepad-3d](../gamepad-3d) |
 | `Input.get_joy_name()` | [device-glyphs](../device-glyphs) |
 | `Input.is_action_just_pressed()` | [character-controller-3d](../character-controller-3d) |
+| `Input.is_action_pressed()` | [skeleton-modifier](../skeleton-modifier) |
 | `Input.is_joy_button_pressed()` | [gamepad-3d](../gamepad-3d) |
 | `Input.start_joy_vibration()` | [gamepad-3d](../gamepad-3d) |
 | `InputMap.action_add_event()` | [input-remapping](../input-remapping) |
@@ -95,7 +106,13 @@ ones where you are looking for *the* example rather than *an* example.
 | `NavigationServer3D` | [navigation-obstacle](../navigation-obstacle) |
 | `NavigationServer3D.map_force_update()` | [navigation-obstacle](../navigation-obstacle) |
 | `NavigationServer3D.map_get_path()` | [navigation-obstacle](../navigation-obstacle) |
+| `NearPlane.near_precision_share()` | [camera-clipping](../camera-clipping) |
+| `NearPlane.precision_cost()` | [camera-clipping](../camera-clipping) |
+| `NearPlane.pushed_out()` | [camera-clipping](../camera-clipping) |
+| `NearPlane.radius()` | [camera-clipping](../camera-clipping) |
+| `NearPlane.safe_distance()` | [camera-clipping](../camera-clipping) |
 | `OmniLight3D` | [volumetric-fog](../volumetric-fog) |
+| `PhysicsShapeQueryParameters3D` | [camera-clipping](../camera-clipping) |
 | `PortalView.camera_transform()` | [portal-3d](../portal-3d) |
 | `PortalView.crossed()` | [portal-3d](../portal-3d) |
 | `PortalView.is_facing()` | [portal-3d](../portal-3d) |
@@ -158,6 +175,10 @@ ones where you are looking for *the* example rather than *an* example.
 | `SkyCycle.sun_colour()` | [environment-fog](../environment-fog) |
 | `SkyCycle.sun_direction()` | [environment-fog](../environment-fog) |
 | `SkyCycle.sun_energy()` | [environment-fog](../environment-fog) |
+| `Splat.dominant()` | [terrain-splatting](../terrain-splatting) |
+| `Splat.material_name()` | [terrain-splatting](../terrain-splatting) |
+| `Splat.slope_of()` | [terrain-splatting](../terrain-splatting) |
+| `Splat.weights_for()` | [terrain-splatting](../terrain-splatting) |
 | `SpringArm3D` | [spring-arm-camera](../spring-arm-camera) |
 | `StepProbe.can_step_onto()` | [shape-cast-3d](../shape-cast-3d) |
 | `StepProbe.name_of()` | [shape-cast-3d](../shape-cast-3d) |
@@ -185,39 +206,39 @@ ones where you are looking for *the* example rather than *an* example.
 
 | API | Demos |
 |-----|-------|
-| `AnimationPlayer` | [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [root-motion](../root-motion), [tween-3d](../tween-3d) |
+| `AnimationPlayer` | [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [root-motion](../root-motion), [skeleton-modifier](../skeleton-modifier), [tween-3d](../tween-3d) |
 | `AnimationTree` | [animation-tree](../animation-tree), [root-motion](../root-motion) |
 | `Area3D` | [area-trigger-3d](../area-trigger-3d), [audio-buses](../audio-buses), [continuous-collision](../continuous-collision) |
 | `ArrayMesh` | [noise-terrain](../noise-terrain), [procedural-mesh](../procedural-mesh), [terrain-collision](../terrain-collision) |
 | `AudioStreamPlayer3D` | [audio-3d](../audio-3d), [audio-buses](../audio-buses) |
-| `Camera3D` | [camera-framing](../camera-framing), [cinematic-camera](../cinematic-camera), [csg-blockout](../csg-blockout), [gamepad-3d](../gamepad-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals), [multimesh](../multimesh) _(+10 more)_ |
-| `CharacterBody3D` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [navigation-3d](../navigation-3d), [root-motion](../root-motion), [shape-cast-3d](../shape-cast-3d), [vehicle-3d](../vehicle-3d) |
-| `CollisionShape3D` | [continuous-collision](../continuous-collision), [joints-3d](../joints-3d), [ragdoll-3d](../ragdoll-3d), [rigid-body-3d](../rigid-body-3d), [terrain-collision](../terrain-collision) |
+| `Camera3D` | [camera-clipping](../camera-clipping), [camera-framing](../camera-framing), [cinematic-camera](../cinematic-camera), [csg-blockout](../csg-blockout), [gamepad-3d](../gamepad-3d), [level-streaming](../level-streaming), [lights-and-shadows](../lights-and-shadows), [lod-and-decals](../lod-and-decals) _(+11 more)_ |
+| `CharacterBody3D` | [camera-clipping](../camera-clipping), [character-controller-3d](../character-controller-3d), [character-push](../character-push), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [navigation-3d](../navigation-3d), [root-motion](../root-motion), [shape-cast-3d](../shape-cast-3d) _(+1 more)_ |
+| `CollisionShape3D` | [continuous-collision](../continuous-collision), [joints-3d](../joints-3d), [ragdoll-3d](../ragdoll-3d), [rigid-body-3d](../rigid-body-3d), [six-dof-joint](../six-dof-joint), [terrain-collision](../terrain-collision) |
 | `Color.from_hsv()` | [camera-framing](../camera-framing), [multiplayer-3d](../multiplayer-3d), [skeleton-3d](../skeleton-3d), [split-screen-3d](../split-screen-3d) |
 | `DirectionalLight3D` | [environment-fog](../environment-fog), [lights-and-shadows](../lights-and-shadows), [volumetric-fog](../volumetric-fog) |
-| `FastNoiseLite` | [accessibility-3d](../accessibility-3d), [camera-shake-3d](../camera-shake-3d), [noise-terrain](../noise-terrain), [terrain-collision](../terrain-collision) |
+| `FastNoiseLite` | [accessibility-3d](../accessibility-3d), [camera-shake-3d](../camera-shake-3d), [noise-terrain](../noise-terrain), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting) |
 | `FileAccess.file_exists()` | [input-remapping](../input-remapping), [save-load-3d](../save-load-3d) |
 | `FileAccess.open()` | [input-remapping](../input-remapping), [save-load-3d](../save-load-3d) |
 | `ImmediateMesh` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
-| `Input.get_axis()` | [client-prediction](../client-prediction), [device-glyphs](../device-glyphs), [input-remapping](../input-remapping), [portal-3d](../portal-3d), [root-motion](../root-motion), [vehicle-3d](../vehicle-3d) |
+| `Input.get_axis()` | [camera-clipping](../camera-clipping), [client-prediction](../client-prediction), [device-glyphs](../device-glyphs), [input-remapping](../input-remapping), [portal-3d](../portal-3d), [root-motion](../root-motion), [vehicle-3d](../vehicle-3d) |
 | `Input.get_connected_joypads()` | [device-glyphs](../device-glyphs), [gamepad-3d](../gamepad-3d) |
 | `Input.get_vector()` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [multiplayer-3d](../multiplayer-3d), [orbit-camera](../orbit-camera), [spring-arm-camera](../spring-arm-camera) |
 | `Input.is_key_pressed()` | [character-controller-3d](../character-controller-3d), [first-person-controller](../first-person-controller), [screen-shader](../screen-shader), [vehicle-3d](../vehicle-3d) |
 | `InputMap.has_action()` | [device-glyphs](../device-glyphs), [input-remapping](../input-remapping) |
-| `MeshInstance3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d) _(+21 more)_ |
+| `MeshInstance3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d) _(+24 more)_ |
 | `NavigationAgent3D` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
 | `NavigationRegion3D` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
-| `Node3D` | [accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-framing](../camera-framing), [camera-shake-3d](../camera-shake-3d) _(+46 more)_ |
+| `Node3D` | [accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing) _(+50 more)_ |
 | `PhysicsRayQueryParameters3D` | [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking) |
 | `PhysicsRayQueryParameters3D.create()` | [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking) |
 | `RayCast3D` | [shape-cast-3d](../shape-cast-3d), [two-bone-ik](../two-bone-ik) |
-| `RigidBody3D` | [area-trigger-3d](../area-trigger-3d), [character-push](../character-push), [continuous-collision](../continuous-collision), [joints-3d](../joints-3d), [rigid-body-3d](../rigid-body-3d), [terrain-collision](../terrain-collision), [vehicle-3d](../vehicle-3d) |
+| `RigidBody3D` | [area-trigger-3d](../area-trigger-3d), [character-push](../character-push), [continuous-collision](../continuous-collision), [joints-3d](../joints-3d), [rigid-body-3d](../rigid-body-3d), [six-dof-joint](../six-dof-joint), [terrain-collision](../terrain-collision), [vehicle-3d](../vehicle-3d) |
 | `ShaderMaterial` | [screen-shader](../screen-shader), [wave-shader](../wave-shader) |
-| `Skeleton3D` | [ragdoll-3d](../ragdoll-3d), [skeleton-3d](../skeleton-3d) |
+| `Skeleton3D` | [ragdoll-3d](../ragdoll-3d), [skeleton-3d](../skeleton-3d), [skeleton-modifier](../skeleton-modifier) |
 | `StandardMaterial3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [grid-map](../grid-map), [level-streaming](../level-streaming), [lod-and-decals](../lod-and-decals), [multiplayer-3d](../multiplayer-3d), [portal-3d](../portal-3d), [raycast-picking](../raycast-picking) _(+4 more)_ |
-| `StaticBody3D` | [joints-3d](../joints-3d), [terrain-collision](../terrain-collision) |
+| `StaticBody3D` | [joints-3d](../joints-3d), [six-dof-joint](../six-dof-joint), [terrain-collision](../terrain-collision) |
 | `SubViewport` | [portal-3d](../portal-3d), [render-to-texture](../render-to-texture), [split-screen-3d](../split-screen-3d) |
-| `SurfaceTool` | [noise-terrain](../noise-terrain), [procedural-mesh](../procedural-mesh), [terrain-collision](../terrain-collision) |
+| `SurfaceTool` | [noise-terrain](../noise-terrain), [procedural-mesh](../procedural-mesh), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting) |
 | `WorldEnvironment` | [environment-fog](../environment-fog), [volumetric-fog](../volumetric-fog) |
 | `add_child()` | [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d), [navigation-3d](../navigation-3d), [rigid-body-3d](../rigid-body-3d) |
 | `move_and_slide()` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [root-motion](../root-motion), [shape-cast-3d](../shape-cast-3d) |
@@ -226,4 +247,4 @@ ones where you are looking for *the* example rather than *an* example.
 
 ---
 
-_208 APIs across 54 demos._
+_229 APIs across 58 demos._

@@ -70,6 +70,24 @@ static func bend_toward(from: Vector3, to: Vector3, strength: float,
 	return Quaternion(axis.normalized(), angle)
 
 
+## How much of the bend belongs to the bone at `index` of `count`.
+##
+## A ramp from the root to the tip. `falloff` below one puts most of the bend
+## near the tip, which is what a tentacle does; above one puts it at the root,
+## which is what an arm reaching does.
+##
+## Separate from `curl()` because it is the part with a rule in it: the resulting
+## joint angles also depend on where each bone already points, so the ramp is the
+## only thing that can be asserted directly.
+static func curl_weight(index: int, count: int, strength: float,
+		falloff: float = 1.0) -> float:
+	if count <= 0:
+		return 0.0
+	# `index + 1`, so the root gets a share rather than none and nothing goes
+	# negative at the top of the chain.
+	return strength * pow(float(index + 1) / float(count), falloff)
+
+
 ## Bend a whole chain toward a target, a little more at each bone.
 ##
 ## `falloff` below one puts most of the bend near the tip, which is what a
@@ -79,7 +97,7 @@ static func curl(skeleton: Skeleton3D, bones: PackedInt32Array, target_local: Ve
 	if skeleton == null or bones.is_empty():
 		return
 	for i in bones.size():
-		var weight := strength * pow(float(i + 1) / float(bones.size()), falloff)
+		var weight := curl_weight(i, bones.size(), strength, falloff)
 		var bone := bones[i]
 		var rest_direction := axis
 		var to_target := target_local - skeleton.get_bone_global_pose(bone).origin

@@ -66,6 +66,13 @@ suite — building, posing, curling, relaxing — is an ordinary test. "Rigs can
 be checked by looking at them" is why so much rig code goes untested, and it is
 not true.
 
+**The weight ramp is its own function.** `curl_weight()` was pulled out of
+`curl()` because it is the part with a rule in it: how much of the bend each
+bone takes, from root to tip. The resulting joint angles also depend on where
+each bone already points, so the ramp is the only piece that can be asserted
+directly — and the mutation testing found `curl()` had no test at all until it
+was separated.
+
 ## Key Godot APIs
 
 | API | Purpose |
@@ -95,6 +102,7 @@ is the demo driver and is not needed.
 - `SkeletonRig.build_chain(skeleton, count, length, axis := Vector3.UP, prefix := "bone") -> PackedInt32Array`
 - `SkeletonRig.bend_toward(from, to, strength, max_angle := PI) -> Quaternion`
 - `SkeletonRig.curl(skeleton, bones, target_local, strength, falloff := 1.0, axis := Vector3.UP)`
+- `SkeletonRig.curl_weight(index, count, strength, falloff := 1.0) -> float`
 - `SkeletonRig.relax(skeleton, bones)`
 - `SkeletonRig.tip_of(skeleton, bone, length, axis := Vector3.UP) -> Vector3`
 

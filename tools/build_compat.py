@@ -70,9 +70,19 @@ def badge(versions, results, demos):
     passing = sum(1 for s in results[newest].values() if s == "PASS")
     total = len(demos)
     mark = "passing" if passing == total else "%d failing" % (total - passing)
-    return ("%s\n**Godot %s** — %d/%d demos %s. "
+
+    # When every version passes everything, say the range rather than only the
+    # newest. "Runs on 4.5.1 through 4.7" is a different and more useful claim
+    # than "passes on 4.7", and it is the one the results actually support.
+    label = "Godot %s" % newest
+    if len(versions) > 1 and all(
+            all(status == "PASS" for status in results[version].values())
+            for version in versions):
+        label = "Godot %s – %s" % (versions[0], newest)
+
+    return ("%s\n**%s** — %d/%d demos %s. "
             "[Full table](docs/COMPATIBILITY.md)\n%s"
-            % (BADGE_START, newest, passing, total, mark, BADGE_END))
+            % (BADGE_START, label, passing, total, mark, BADGE_END))
 
 
 def write_badge(text, check):

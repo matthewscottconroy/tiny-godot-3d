@@ -51,13 +51,14 @@ single "forward" any more, so movement and camera stop being separable problems.
 | 1 | [csg-blockout](../csg-blockout) | 🟡 | Greyboxing first: rooms as boxes added and cut, before anything is modelled or generated |
 | 2 | [procedural-mesh](../procedural-mesh) | 🔴 | Geometry in code with `SurfaceTool`: vertices, winding order, shared indices, and why normals have to be derived rather than assumed |
 | 3 | [noise-terrain](../noise-terrain) | 🔴 | The same machinery driven by `FastNoiseLite`, with one height function the mesh and everything standing on it both use |
-| 4 | [terrain-collision](../terrain-collision) | 🔴 | Standing on it: a `HeightMapShape3D` from the same heights, and the scale that makes it line up |
-| 5 | [grid-map](../grid-map) | 🟡 | The other way to build a level: a `MeshLibrary` made in code, and rooms drawn as text |
-| 6 | [multimesh](../multimesh) | 🟡 | Filling it with scenery — thousands of instances in one draw call, and a cull that costs one integer |
-| 7 | [navigation-3d](../navigation-3d) | 🔴 | Getting something to walk across what you built, and the three ways a path silently comes back empty |
-| 8 | [navigation-obstacle](../navigation-obstacle) | 🔴 | The door in the corridor, and why dropping an obstacle on it changes no path at all |
-| 9 | [save-load-3d](../save-load-3d) | 🟡 | Persisting what the player did to it, and surviving the level being edited underneath the save |
-| 10 | [editor-tool-3d](../editor-tool-3d) | 🔴 | Building levels *in the editor*, with a `@tool` script that cannot corrupt the scene |
+| 4 | [terrain-splatting](../terrain-splatting) | 🔴 | Deciding what it is made of, from its own slope and height |
+| 5 | [terrain-collision](../terrain-collision) | 🔴 | Standing on it: a `HeightMapShape3D` from the same heights, and the scale that makes it line up |
+| 6 | [grid-map](../grid-map) | 🟡 | The other way to build a level: a `MeshLibrary` made in code, and rooms drawn as text |
+| 7 | [multimesh](../multimesh) | 🟡 | Filling it with scenery — thousands of instances in one draw call, and a cull that costs one integer |
+| 8 | [navigation-3d](../navigation-3d) | 🔴 | Getting something to walk across what you built, and the three ways a path silently comes back empty |
+| 9 | [navigation-obstacle](../navigation-obstacle) | 🔴 | The door in the corridor, and why dropping an obstacle on it changes no path at all |
+| 10 | [save-load-3d](../save-load-3d) | 🟡 | Persisting what the player did to it, and surviving the level being edited underneath the save |
+| 11 | [editor-tool-3d](../editor-tool-3d) | 🔴 | Building levels *in the editor*, with a `@tool` script that cannot corrupt the scene |
 
 **Missing from this path:** CSG blockouts, terrain collision, and level
 streaming.
@@ -77,8 +78,9 @@ streaming.
 | 7 | [audio-buses](../audio-buses) | 🟡 | Routing what it all sounds like, and a reverb you walk into |
 | 8 | [continuous-collision](../continuous-collision) | 🔴 | Why the fast thing goes straight through the wall, and the three fixes worth knowing |
 | 9 | [vehicle-3d](../vehicle-3d) | 🟡 | A whole vehicle out of the same parts — and what you give up by making it a rigid body |
-| 10 | [ragdoll-3d](../ragdoll-3d) | 🔴 | Handing a character over to the physics, and taking it back |
-| 11 | [object-pool-3d](../object-pool-3d) | 🟡 | Doing all of it repeatedly without the periodic stutter that allocation brings |
+| 10 | [six-dof-joint](../six-dof-joint) | 🔴 | The general case of a constraint, and how to say which axis you meant |
+| 11 | [ragdoll-3d](../ragdoll-3d) | 🔴 | Handing a character over to the physics, and taking it back |
+| 12 | [object-pool-3d](../object-pool-3d) | 🟡 | Doing all of it repeatedly without the periodic stutter that allocation brings |
 
 **Missing from this path:** `Generic6DOFJoint3D`, and continuous collision for
 a character rather than a projectile.
@@ -104,7 +106,8 @@ like nothing at all.
 | 9 | [animation-tree](../animation-tree) | 🔴 | Choosing between those clips at runtime: a blend space driven by speed, built in code |
 | 10 | [root-motion](../root-motion) | 🔴 | Letting the clip decide where the character goes, and the sliding feet that fixes |
 | 11 | [skeleton-3d](../skeleton-3d) | 🔴 | What an imported rig actually is: bones, rests, and poses local to a parent |
-| 12 | [two-bone-ik](../two-bone-ik) | 🔴 | The other kind of motion: a foot that has to be *there*, and a knee that follows |
+| 12 | [two-bone-ik](../two-bone-ik) | 🔴 | The other kind of motion
+| 13 | [skeleton-modifier](../skeleton-modifier) | 🔴 | And the supported place to put either of them, so the animation does not undo it |: a foot that has to be *there*, and a knee that follows |
 
 **Missing from this path:** materials and transparency sorting, decals, LOD, and
 an `AnimationTree` to blend the clips step 4 builds.
@@ -125,8 +128,9 @@ you have three systems that all want to move it, and a shape that lets them.
 | 4 | [camera-shake-3d](../camera-shake-3d) | 🟡 | Adding shake to a transform something else already owns |
 | 5 | [camera-framing](../camera-framing) | 🟡 | Keeping several things on screen at once, without losing the one that wandered off |
 | 6 | [render-to-texture](../render-to-texture) | 🟡 | Pointing a second camera at a surface in the world, and what it costs every frame |
-| 7 | [portal-3d](../portal-3d) | 🔴 | A second camera whose transform comes from the player's, through a pair of doorways |
-| 8 | [split-screen-3d](../split-screen-3d) | 🔴 | Or giving up and drawing two views, with the shared World3D that makes the second one show anything |
+| 7 | [camera-clipping](../camera-clipping) | 🟡 | Why the wall you stand against vanishes, and the near plane behind it |
+| 8 | [portal-3d](../portal-3d) | 🔴 | A second camera whose transform comes from the player's, through a pair of doorways |
+| 9 | [split-screen-3d](../split-screen-3d) | 🔴 | Or giving up and drawing two views, with the shared World3D that makes the second one show anything |
 
 **Missing from this path:** baked lighting, and volumetric fog.
 

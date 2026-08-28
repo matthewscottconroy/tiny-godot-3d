@@ -24,15 +24,15 @@ Looking for a route rather than a catalogue? See [learning paths](LEARNING_PATHS
 |---|---|---|
 | _(no screenshot yet)_<br>**[orbit-camera](../orbit-camera)**<br><sub>A third-person camera that orbits a target, with pitch limits and camera-relative movement.</sub> | _(no screenshot yet)_<br>**[spring-arm-camera](../spring-arm-camera)**<br><sub>A third-person camera on a SpringArm3D that collides with the level, and eases back out when it clears.</sub> | _(no screenshot yet)_<br>**[cinematic-camera](../cinematic-camera)**<br><sub>A camera on a Path3D, and the blend between gameplay and cutscene that Godot does not do for you.</sub> |
 | _(no screenshot yet)_<br>**[camera-shake-3d](../camera-shake-3d)**<br><sub>Camera shake as an offset a rig can carry, with trauma that decays and noise that is the same every run.</sub> | _(no screenshot yet)_<br>**[camera-framing](../camera-framing)**<br><sub>A camera that keeps several things on screen at once — the RTS and party-game problem, as arithmetic.</sub> | _(no screenshot yet)_<br>**[split-screen-3d](../split-screen-3d)**<br><sub>Two players, two viewports, one world — and the shared World3D that makes the second view show anything at all.</sub> |
-| _(no screenshot yet)_<br>**[portal-3d](../portal-3d)**<br><sub>A portal you can see through and walk through, and the transform that puts the second camera in the right place.</sub> |  |  |
+| _(no screenshot yet)_<br>**[portal-3d](../portal-3d)**<br><sub>A portal you can see through and walk through, and the transform that puts the second camera in the right place.</sub> | _(no screenshot yet)_<br>**[camera-clipping](../camera-clipping)**<br><sub>Why the wall you stand against disappears, and what the near plane costs to fix it.</sub> |  |
 
 ## ⚙️ Physics & Queries
 
 | | | |
 |---|---|---|
 | _(no screenshot yet)_<br>**[rigid-body-3d](../rigid-body-3d)**<br><sub>RigidBody3D boxes that fall, stack, and scatter — impulses versus setting a transform.</sub> | _(no screenshot yet)_<br>**[raycast-picking](../raycast-picking)**<br><sub>Turning a mouse position into a world ray, and asking the physics space what it hit.</sub> | _(no screenshot yet)_<br>**[area-trigger-3d](../area-trigger-3d)**<br><sub>Area3D triggers that fire on the transition rather than per body, with collision layers deciding what counts.</sub> |
-| _(no screenshot yet)_<br>**[joints-3d](../joints-3d)**<br><sub>A HingeJoint3D door with limits and a motor, and a PinJoint3D chain — physics constraints instead of animation.</sub> | _(no screenshot yet)_<br>**[terrain-collision](../terrain-collision)**<br><sub>A HeightMapShape3D that lines up with the mesh it came from — and what happens when the spacing does not match.</sub> | _(no screenshot yet)_<br>**[continuous-collision](../continuous-collision)**<br><sub>A fast projectile that goes straight through a wall, and the three ways to stop it.</sub> |
-| _(no screenshot yet)_<br>**[vehicle-3d](../vehicle-3d)**<br><sub>A VehicleBody3D that drives, the arithmetic that keeps it drivable, and the sign that catches everyone.</sub> | _(no screenshot yet)_<br>**[ragdoll-3d](../ragdoll-3d)**<br><sub>The hand-off from animation to physics, and the blend back that stops it snapping.</sub> |  |
+| _(no screenshot yet)_<br>**[joints-3d](../joints-3d)**<br><sub>A HingeJoint3D door with limits and a motor, and a PinJoint3D chain — physics constraints instead of animation.</sub> | _(no screenshot yet)_<br>**[six-dof-joint](../six-dof-joint)**<br><sub>The joint that does everything, and how to say which of its six axes you meant.</sub> | _(no screenshot yet)_<br>**[terrain-collision](../terrain-collision)**<br><sub>A HeightMapShape3D that lines up with the mesh it came from — and what happens when the spacing does not match.</sub> |
+| _(no screenshot yet)_<br>**[continuous-collision](../continuous-collision)**<br><sub>A fast projectile that goes straight through a wall, and the three ways to stop it.</sub> | _(no screenshot yet)_<br>**[vehicle-3d](../vehicle-3d)**<br><sub>A VehicleBody3D that drives, the arithmetic that keeps it drivable, and the sign that catches everyone.</sub> | _(no screenshot yet)_<br>**[ragdoll-3d](../ragdoll-3d)**<br><sub>The hand-off from animation to physics, and the blend back that stops it snapping.</sub> |
 
 ## 🗺️ Level Building & Navigation
 
@@ -45,7 +45,8 @@ Looking for a route rather than a catalogue? See [learning paths](LEARNING_PATHS
 
 | | | |
 |---|---|---|
-| _(no screenshot yet)_<br>**[procedural-mesh](../procedural-mesh)**<br><sub>Building geometry with `SurfaceTool`: vertices, winding order, indices, and normals.</sub> | _(no screenshot yet)_<br>**[noise-terrain](../noise-terrain)**<br><sub>A heightmap from FastNoiseLite turned into a mesh, with slope-shaded regions and a seed you can change.</sub> | _(no screenshot yet)_<br>**[multimesh](../multimesh)**<br><sub>Ten thousand instances in one draw call with MultiMeshInstance3D, and a distance cull that costs nothing.</sub> |
+| _(no screenshot yet)_<br>**[procedural-mesh](../procedural-mesh)**<br><sub>Building geometry with `SurfaceTool`: vertices, winding order, indices, and normals.</sub> | _(no screenshot yet)_<br>**[noise-terrain](../noise-terrain)**<br><sub>A heightmap from FastNoiseLite turned into a mesh, with slope-shaded regions and a seed you can change.</sub> | _(no screenshot yet)_<br>**[terrain-splatting](../terrain-splatting)**<br><sub>Texturing terrain by slope and height, with weights that add up and edges that do not band.</sub> |
+| _(no screenshot yet)_<br>**[multimesh](../multimesh)**<br><sub>Ten thousand instances in one draw call with MultiMeshInstance3D, and a distance cull that costs nothing.</sub> |  |  |
 
 ## 💡 Rendering & Light
 
@@ -61,7 +62,7 @@ Looking for a route rather than a catalogue? See [learning paths](LEARNING_PATHS
 |---|---|---|
 | _(no screenshot yet)_<br>**[animation-in-code](../animation-in-code)**<br><sub>Building an Animation and an AnimationPlayer at runtime — a walk cycle with no animation data on disk.</sub> | _(no screenshot yet)_<br>**[animation-tree](../animation-tree)**<br><sub>An AnimationTree blend space driven by speed, built in code — and the deadzone that stops a standing character twitching.</sub> | _(no screenshot yet)_<br>**[root-motion](../root-motion)**<br><sub>Motion that comes from the animation rather than the code, and the sliding feet it fixes.</sub> |
 | _(no screenshot yet)_<br>**[tween-3d](../tween-3d)**<br><sub>Tween or AnimationPlayer — what each is for, and the two tweens that end up fighting over one property.</sub> | _(no screenshot yet)_<br>**[skeleton-3d](../skeleton-3d)**<br><sub>Building a Skeleton3D in code and posing its bones — local poses, rests, and what BoneAttachment3D is for.</sub> | _(no screenshot yet)_<br>**[two-bone-ik](../two-bone-ik)**<br><sub>Two-bone inverse kinematics: where the knee goes when the foot is planted, and what happens when it cannot reach.</sub> |
-| _(no screenshot yet)_<br>**[audio-3d](../audio-3d)**<br><sub>Positional audio with AudioStreamPlayer3D, and a hearing model the game logic can share with it.</sub> | _(no screenshot yet)_<br>**[audio-buses](../audio-buses)**<br><sub>Audio buses built at runtime: sliders that are decibels, a mute that is not a volume, and a reverb you walk into.</sub> |  |
+| _(no screenshot yet)_<br>**[skeleton-modifier](../skeleton-modifier)**<br><sub>The supported place to change a pose after the animation has set it — and why _process() is not it.</sub> | _(no screenshot yet)_<br>**[audio-3d](../audio-3d)**<br><sub>Positional audio with AudioStreamPlayer3D, and a hearing model the game logic can share with it.</sub> | _(no screenshot yet)_<br>**[audio-buses](../audio-buses)**<br><sub>Audio buses built at runtime: sliders that are decibels, a mute that is not a volume, and a reverb you walk into.</sub> |
 
 ## 💾 Data & Systems
 
@@ -73,4 +74,4 @@ Looking for a route rather than a catalogue? See [learning paths](LEARNING_PATHS
 
 ---
 
-_54 demos, 0 with screenshots, 0 animated._
+_58 demos, 0 with screenshots, 0 animated._

@@ -133,7 +133,7 @@ the demo driver, though the negated `engine_force` line is worth taking with it.
 ## Related demos
 
 - [continuous-collision](../continuous-collision) — A fast projectile that goes straight through a wall, and the three ways to stop it.
-- [ragdoll-3d](../ragdoll-3d) — The hand-off from animation to physics, and the blend back that stops it snapping.
+- [six-dof-joint](../six-dof-joint) — The joint that does everything, and how to say which of its six axes you meant.
 - [character-controller-3d](../character-controller-3d) — Walking, running and jumping a `CharacterBody3D`, with the movement rules separated from the body.
 - [first-person-controller](../first-person-controller) — Mouse look, WASD movement and head bob on a CharacterBody3D — the rig separated from the body.
 
