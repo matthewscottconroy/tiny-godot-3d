@@ -10,14 +10,15 @@
 # REQUIRES A DISPLAY. Godot's --headless mode uses a dummy rendering driver:
 # there is no framebuffer, so get_viewport().get_texture().get_image() returns
 # null and nothing can be captured. This script therefore runs Godot under
-# xvfb-run, a virtual X server.
+# xvfb-run, a virtual X server — or, if xvfb is not installed, on whatever
+# display you already have, which opens a window per demo.
 #
 #   Debian/Ubuntu:  sudo apt-get install xvfb
 #   Fedora:         sudo dnf install xorg-x11-server-Xvfb
 #
-# If xvfb is missing the script says so and exits rather than producing blank
-# images. `tools/preflight.sh` reports the same thing without starting a
-# capture, which is the cheaper way to find out.
+# With neither xvfb nor a display the script says so and exits rather than
+# producing blank images. `tools/preflight.sh` reports which of the two you have
+# without starting a capture, which is the cheaper way to find out.
 # ---------------------------------------------------------------------------
 #
 # Capture uses Godot's Movie Maker mode (--write-movie) rather than a script
@@ -60,13 +61,26 @@ if ! command -v "$GODOT" >/dev/null 2>&1; then
   exit 127
 fi
 
-if ! command -v xvfb-run >/dev/null 2>&1; then
+# How to give Godot a framebuffer. xvfb is preferred even on a machine that has
+# a display: the capture is isolated, deterministic and does not put 58 windows
+# on top of whatever you were doing. But requiring it means the pipeline cannot
+# run at all without root on a machine that already has a perfectly good display
+# attached, so fall back to that rather than refusing.
+LAUNCH=()
+if command -v xvfb-run >/dev/null 2>&1; then
+  LAUNCH=(xvfb-run -a)
+elif [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+  echo "note: xvfb-run not found — capturing on your own display instead." >&2
+  echo "      A window will open for each demo. Install xvfb to avoid that:" >&2
+  echo "        Debian/Ubuntu: sudo apt-get install xvfb" >&2
+  echo "        Fedora:        sudo dnf install xorg-x11-server-Xvfb" >&2
+else
   cat >&2 <<'MSG'
-error: xvfb-run not found.
+error: no framebuffer available — xvfb-run not found and no display attached.
 
 Screenshots need a real framebuffer. Godot's --headless renderer is a dummy
 driver that cannot produce an image, so this script runs Godot under a virtual
-X server instead.
+X server, or on your own display if there is one.
 
   Debian/Ubuntu:  sudo apt-get install xvfb
   Fedora:         sudo dnf install xorg-x11-server-Xvfb
@@ -104,7 +118,7 @@ for demo in "${demos[@]}"; do
 
   # Movie Maker forces a fixed frame rate and writes one PNG per frame, so the
   # capture is deterministic regardless of how fast the machine is.
-  xvfb-run -a "$GODOT" --path "$demo" "$scene" \
+  "${LAUNCH[@]}" "$GODOT" --path "$demo" "$scene" \
       --write-movie "$frames/frame.png" \
       --fixed-fps 60 --quit-after "$TOTAL_FRAMES" >/dev/null 2>&1
 
