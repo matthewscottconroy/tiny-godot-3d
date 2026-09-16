@@ -19,6 +19,7 @@ ones where you are looking for *the* example rather than *an* example.
 | `AlphaSorter.back_to_front()` | [transparency-3d](../transparency-3d) |
 | `AlphaSorter.depth_ranges_overlap()` | [transparency-3d](../transparency-3d) |
 | `AlphaSorter.priorities()` | [transparency-3d](../transparency-3d) |
+| `AnimatableBody3D` | [spring-arm-camera](../spring-arm-camera) |
 | `ArmSmoothing.is_obstructed()` | [spring-arm-camera](../spring-arm-camera) |
 | `ArmSmoothing.recover_clamped()` | [spring-arm-camera](../spring-arm-camera) |
 | `AudioServer.add_bus()` | [audio-buses](../audio-buses) |
@@ -180,6 +181,9 @@ ones where you are looking for *the* example rather than *an* example.
 | `Splat.slope_of()` | [terrain-splatting](../terrain-splatting) |
 | `Splat.weights_for()` | [terrain-splatting](../terrain-splatting) |
 | `SpringArm3D` | [spring-arm-camera](../spring-arm-camera) |
+| `SpringArm3D.add_excluded_object()` | [spring-arm-camera](../spring-arm-camera) |
+| `SpringRig.move_direction()` | [spring-arm-camera](../spring-arm-camera) |
+| `SpringRig.pivot_position()` | [spring-arm-camera](../spring-arm-camera) |
 | `StepProbe.can_step_onto()` | [shape-cast-3d](../shape-cast-3d) |
 | `StepProbe.name_of()` | [shape-cast-3d](../shape-cast-3d) |
 | `StepProbe.step_target()` | [shape-cast-3d](../shape-cast-3d) |
@@ -247,4 +251,4 @@ ones where you are looking for *the* example rather than *an* example.
 
 ---
 
-_229 APIs across 58 demos._
+_233 APIs across 58 demos._

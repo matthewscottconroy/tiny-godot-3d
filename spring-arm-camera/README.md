@@ -40,10 +40,24 @@ still puts the camera's near plane inside the wall.
 the near plane has somewhere to be. Without it the camera rests exactly on the
 surface and clips through.
 
+**The character has to be excluded by hand.** The sweep starts at head height,
+right beside the collider it is supposed to be looking past, so pitch the camera
+down and the first thing it finds is the player: the arm collapses and the view
+spends the rest of the game inside their skull. `add_excluded_object()` takes an
+RID and is the only way to say it — a collision layer cannot, because every
+*other* body on the layer is precisely what the arm is looking for. The target
+here is an `AnimatableBody3D` with a real capsule, so the problem is real and
+the fix is visible; give it no collider and the demo would appear to work while
+teaching nothing.
+
 **The pivot orbits, the arm hangs off it.** Yaw and pitch are applied to a
 `Pivot` node; the arm and the camera are its children, so the arm's local +Z is
 always "straight back from where we are looking" and the length stays a plain
-number rather than a vector to reason about.
+number rather than a vector to reason about. Where that pivot goes, and which
+way "forward" is once it has turned, are `SpringRig` — arithmetic, so the suite
+can state it. A strafe that comes out mirrored still walks the character
+somewhere plausible, which is exactly why it needs asserting rather than
+watching.
 
 **Smoothing is the demo's own.** `ArmSmoothing.recover()` moves the current
 length toward what the arm allows, at `in_rate` when shortening and `out_rate`
@@ -73,29 +87,36 @@ exactly where one whole step does.
 | File | What it holds |
 |------|---------------|
 | `scripts/arm_smoothing.gd` | The `ArmSmoothing` component: asymmetric, frame-rate-independent length recovery |
-| `scripts/main.gd` | Demo driver: pivot, arm, camera, and target movement |
+| `scripts/spring_rig.gd` | The `SpringRig` component: where the pivot sits, and camera-relative movement |
+| `scripts/main.gd` | Demo driver: input, the arm's exclusion, and the HUD |
 | `scenes/main.tscn` | Floor, two walls, the target, and the camera rig |
 | `tests/test_logic.gd` | Headless test suite — including one that drives the real arm into a real wall |
 | `tests/frames` | How many frames the suite needs, since it waits on physics |
 
 ## Use as a building block
 
-**Copy:** `scripts/arm_smoothing.gd` — the `ArmSmoothing` type. `scripts/main.gd`
-is the demo driver and is not needed; the arm itself is a stock Godot node.
+**Copy:** `scripts/arm_smoothing.gd` and `scripts/spring_rig.gd` — the
+`ArmSmoothing` and `SpringRig` types. `scripts/main.gd` is the demo driver and
+is not needed; the arm itself is a stock Godot node.
 
 **Public API**
 - `ArmSmoothing.recover(current, target, in_rate, out_rate, delta) -> float`
 - `ArmSmoothing.recover_clamped(current, target, in_rate, out_rate, delta, min_length, max_length) -> float`
 - `ArmSmoothing.is_obstructed(current, wanted, tolerance := 0.05) -> bool`
+- `SpringRig.pivot_position(target_position, height) -> Vector3`
+- `SpringRig.ground_basis(pivot_basis) -> Dictionary` — `forward` and `right`, flattened
+- `SpringRig.move_direction(pivot_basis, input) -> Vector3`
 
 **Integrate**
 1. Put a `SpringArm3D` under whatever orbits, give it a shape and a margin, and
    set `spring_length` to the distance you want in the open.
 2. Each physics frame, feed `get_hit_length()` into `recover_clamped()` and place
    the camera at that distance along the arm's +Z.
-3. Call `arm.add_excluded_object(player.get_rid())` — otherwise the player's own
-   collider is the first thing the sweep finds, and the camera lives in their
-   head.
+3. Call `arm.add_excluded_object(player.get_rid())`, as `_ready()` does here.
+   The sweep starts at head height, right next to the character's own collider;
+   pitch the camera down without this and the arm stops on the player, leaving
+   the camera inside their head. A collision layer cannot express it, because
+   every *other* body on that layer is exactly what the arm is looking for.
 
 **Notes**
 - `class_name ArmSmoothing` is global to the project — rename it if you already

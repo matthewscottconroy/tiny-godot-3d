@@ -11,6 +11,8 @@ var _pass := 0
 var _fail := 0
 var _frame := 0
 var _scene: Node3D = null
+var _probe: SpringArm3D = null
+var _blocker: StaticBody3D = null
 
 func _ready() -> void:
 	test_pulling_in_is_immediate()
@@ -21,6 +23,10 @@ func _ready() -> void:
 	test_nothing_happens_without_time()
 	test_clamping_to_the_arms_limits()
 	test_obstruction_is_reported()
+	test_the_pivot_sits_above_the_target()
+	test_the_ground_basis_is_flat()
+	test_movement_is_camera_relative()
+	test_a_vertical_rig_does_not_stop_movement()
 
 func expect(cond: bool, label: String) -> void:
 	if cond:
@@ -110,7 +116,79 @@ func test_obstruction_is_reported() -> void:
 	expect(not ArmSmoothing.is_obstructed(6.0, 5.99),
 		"and neither does floating-point noise at full extension")
 
+# --- the rig the arm hangs off ---------------------------------------------
+
+func test_the_pivot_sits_above_the_target() -> void:
+	print("pivot")
+	var pivot := SpringRig.pivot_position(Vector3(2.0, 0.7, -3.0), 1.2)
+	expect(is_equal_approx(pivot.y, 1.9), "the pivot is raised to head height, not centred")
+	expect(is_equal_approx(pivot.x, 2.0) and is_equal_approx(pivot.z, -3.0),
+		"and follows the target on the ground plane")
+
+func test_the_ground_basis_is_flat() -> void:
+	print("ground basis")
+	# A rig pitched steeply down. Un-flattened, "forward" would point into the
+	# floor and holding forward would walk the character underground.
+	var pitched := Basis.from_euler(Vector3(-0.9, 0.0, 0.0))
+	var basis := SpringRig.ground_basis(pitched)
+	var forward: Vector3 = basis["forward"]
+	var right: Vector3 = basis["right"]
+	expect(is_zero_approx(forward.y), "forward is flattened onto the ground plane")
+	expect(is_zero_approx(right.y), "and so is right")
+	expect(is_equal_approx(forward.length(), 1.0), "forward is a unit vector")
+	expect(is_zero_approx(forward.dot(right)), "and right is perpendicular to it")
+
+func test_movement_is_camera_relative() -> void:
+	print("camera-relative movement")
+	# Yawed a quarter turn: "forward" for the player is now world -X, because
+	# the camera is looking that way. This is the sign that a demo gets wrong
+	# and nobody notices, because walking still happens — just sideways.
+	var yawed := Basis.from_euler(Vector3(0.0, PI / 2.0, 0.0))
+	var forward := SpringRig.move_direction(yawed, Vector2(0.0, -1.0))
+	expect(forward.x < -0.9, "pushing up walks away from a quarter-turned camera")
+	var strafe := SpringRig.move_direction(yawed, Vector2(1.0, 0.0))
+	expect(strafe.z < -0.9, "and pushing right strafes to the camera's right")
+	expect(is_zero_approx(forward.dot(strafe)), "the two are perpendicular")
+	expect(SpringRig.move_direction(yawed, Vector2.ZERO) == Vector3.ZERO,
+		"no input is no direction, rather than a normalised zero")
+
+func test_a_vertical_rig_does_not_stop_movement() -> void:
+	print("degenerate rig")
+	# Straight down, the flattened forward is zero and normalising it gives
+	# (0, 0, 0) rather than an error — movement silently stops. The demo clamps
+	# well short of this, but an adopter who raises the limit would not.
+	var straight_down := Basis.from_euler(Vector3(-PI / 2.0, 0.0, 0.0))
+	var direction := SpringRig.move_direction(straight_down, Vector2(0.0, -1.0))
+	expect(is_equal_approx(direction.length(), 1.0),
+		"a vertical rig still yields a usable direction")
+
 # --- the real arm ----------------------------------------------------------
+
+## An arm with one body squarely in its sweep, away from the demo's scene.
+##
+## Built here rather than driven through main.gd: the point is what the *engine*
+## does with an exclusion, and a bare arm states that in one number.
+func _build_exclusion_probe() -> void:
+	print("exclusions")
+	var root := Node3D.new()
+	root.position = Vector3(0.0, 100.0, 0.0)      # clear of the demo's level
+	add_child(root)
+
+	_blocker = StaticBody3D.new()
+	_blocker.position = Vector3(0.0, 100.0, 2.0)  # 2 m along the arm's +Z sweep
+	var blocker_shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(4.0, 4.0, 0.5)
+	blocker_shape.shape = box
+	_blocker.add_child(blocker_shape)
+	add_child(_blocker)
+
+	_probe = SpringArm3D.new()
+	_probe.spring_length = 5.0
+	var sphere := SphereShape3D.new()
+	sphere.radius = 0.3
+	_probe.shape = sphere
+	root.add_child(_probe)
 
 func _physics_process(_delta: float) -> void:
 	_frame += 1
@@ -137,4 +215,21 @@ func _physics_process(_delta: float) -> void:
 			expect(camera.position.z < arm.spring_length,
 				"and the driver moved the camera in to match")
 			expect(camera.position.z > 0.0, "without pulling it through the target")
+			_build_exclusion_probe()
+		17:
+			# The character's own collider is in the sweep's way, and the arm
+			# has no idea it is special: it stops on it like any other body.
+			expect(_probe.get_hit_length() < _probe.spring_length,
+				"an unexcluded body in the sweep shortens the arm (%.2f of %.1f)"
+				% [_probe.get_hit_length(), _probe.spring_length])
+			_probe.add_excluded_object(_blocker.get_rid())
+		20:
+			# Same body, same position — the arm now sweeps straight past it.
+			# This is the whole reason the demo calls add_excluded_object().
+			expect(is_equal_approx(_probe.get_hit_length(), _probe.spring_length),
+				"excluding it lets the arm reach its full length again")
+			_probe.remove_excluded_object(_blocker.get_rid())
+		23:
+			expect(_probe.get_hit_length() < _probe.spring_length,
+				"and removing the exclusion puts it back in the way")
 			_report()
