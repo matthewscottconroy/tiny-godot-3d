@@ -62,7 +62,7 @@ func _place_markers() -> void:
 		marker.position = point + Vector3.UP * 0.05
 		add_child(marker)
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if not _running or _route.finished():
 		return
 

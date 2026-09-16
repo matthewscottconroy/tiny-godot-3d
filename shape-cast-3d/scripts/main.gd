@@ -20,7 +20,7 @@ var _max_step := 0.45
 func _ready() -> void:
 	_hint.text = "1/2 lower or raise the step limit   Space turn round   the steps get taller"
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var forward := Vector3(0, 0, -_direction)
 	_probe.target_position = Vector3(0, 0, -_direction * 0.45)
 	# The cast has to be re-run after moving it, in the same frame — otherwise
