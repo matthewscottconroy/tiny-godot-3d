@@ -2,13 +2,13 @@
 
 A collection of **58 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
 
-Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7 — every
+Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7.1 — every
 demo passes on all three. Every demo is **3D** — 2D lives in its own
 collection, [tiny-godot-games](https://github.com/matthewscottconroy/tiny-godot-games), which covers it in 165
 demos and shares this repository's conventions and tooling.
 
 <!-- compat-badge -->
-**Godot 4.5.1 – 4.7** — 58/58 demos passing. [Full table](docs/COMPATIBILITY.md)
+**Godot 4.5.1 – 4.7.1** — 58/58 demos passing. [Full table](docs/COMPATIBILITY.md)
 <!-- /compat-badge -->
 
 > **Status: growing.** Fifty-eight demos so far. The harness, conventions,
@@ -87,7 +87,7 @@ Other tooling:
 
 ```bash
 tools/preflight.sh        # which of these pipelines can run on this machine
-tools/check_docs.py       # README structure, control claims, index drift, unlit scenes
+tools/check_docs.py       # README structure, control and API claims, index drift, unlit scenes
 tools/new-demo.sh <name>  # scaffold a demo that is green from the start
 tools/build_tags.py       # derive each demo's concept tags from its source
 tools/build_index.py      # API cross-reference and related-demo links

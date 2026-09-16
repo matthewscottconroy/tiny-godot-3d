@@ -83,7 +83,7 @@ measures and how to read a report.
 | Check | What it catches |
 |-------|-----------------|
 | `./run-tests.sh` | Demos that fail to load, failing assertions, engine warnings, and suites that abort partway |
-| `tools/check_docs.py` | Missing README sections, controls the code never binds, index drift, demo-count drift, demos that link to nothing, suites too thin to be checking much, scenes with no light in them |
+| `tools/check_docs.py` | Missing README sections, controls the code never binds, APIs the Key Godot APIs table names but no file uses, index drift, demo-count drift, a compatibility table that has fallen behind the CI matrix, demos that link to nothing, suites too thin to be checking much, scenes with no light in them |
 | `tools/build_index.py --check` | A stale API index or stale related-demo links |
 | `tools/build_tags.py --check` | Concept tags that no longer match the source they are derived from |
 | `tools/mutate.py --check` | A test suite that got weaker (weekly, not per-push) |
@@ -161,7 +161,12 @@ All six are required, and `tools/check_docs.py` enforces their presence:
 - **Purpose** — why this matters in a real game. Not a restatement of the title.
 - **Controls** — every input. Say "none" if the demo is passive.
 - **How It Works** — the mechanism, in the order it happens.
-- **Key Godot APIs** — a table of what to look up in the docs.
+- **Key Godot APIs** — a table of what to look up in the docs. Every row must
+  name something the demo's own scripts, scenes, shaders or suite actually use;
+  `check_docs.py` fails a row that does not. Advice an adopter needs but the
+  demo does not show belongs in the prose, or in a row marked
+  `(not used here)`. Six READMEs had drifted into listing an API nothing
+  called, formatted identically to the rows that were real.
 - **Files** — what each file holds.
 - **Use as a building block** — what to copy, the public API, and any autoloads,
   input actions, or project settings an adopter needs.
