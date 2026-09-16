@@ -224,6 +224,17 @@ func _check_the_environment() -> void:
 	var lamp: OmniLight3D = _scene.get_node("Lamp")
 	expect(sun.light_volumetric_fog_energy > 0.0, "the sun contributes to the fog volume")
 	expect(lamp.light_volumetric_fog_energy > 0.0, "and so does the lamp")
+	# And by the amount the demo intends. The lamp is deliberately the brighter
+	# of the two in fog — it is the one you walk up to — and "greater than zero"
+	# is just as true of a lamp half the sun's strength.
+	expect(is_equal_approx(lamp.light_volumetric_fog_energy,
+			sun.light_volumetric_fog_energy * 2.0),
+		"the lamp is twice the sun's contribution, not a fraction of it")
+
+	# Direct light is only half of it: gi_inject is what lets already-bounced
+	# light reach the fog, and it is off unless something sets it.
+	expect(environment.volumetric_fog_gi_inject > 0.0,
+		"and bounced light is injected into the fog volume too")
 
 	# And turning the shafts off has to actually reach the lights, not just the
 	# readout.
@@ -231,6 +242,8 @@ func _check_the_environment() -> void:
 	_scene.call("_apply")
 	expect(is_zero_approx(_scene.get_node("Sun").light_volumetric_fog_energy),
 		"turning shafts off takes the light out of the fog")
+	expect(is_zero_approx(environment.volumetric_fog_gi_inject),
+		"and takes the bounced light out with it")
 
 	var method := str(ProjectSettings.get_setting("rendering/renderer/rendering_method", ""))
 	expect(Volumetrics.supported(method),

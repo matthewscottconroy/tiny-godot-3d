@@ -48,6 +48,11 @@ func _build() -> void:
 
 		var camera := Camera3D.new()
 		camera.fov = BASE_FOV
+		# `fov` is only an angle once you say which axis it measures. KEEP_HEIGHT
+		# makes it the vertical one, which is the assumption ScreenLayout's
+		# matched_fov() is built on — leave it at the default and the correction
+		# below is being applied to an angle that already moved.
+		camera.keep_aspect = Camera3D.KEEP_HEIGHT
 		# Each viewport needs its own current camera. `current` is per viewport,
 		# not global, which is why this works at all.
 		view.add_child(camera)

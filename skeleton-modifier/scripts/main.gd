@@ -35,6 +35,13 @@ func _ready() -> void:
 	_modifier.set("target", _target)
 	_modifier.influence = 1.0
 
+	# Which frame the skeleton runs its modifiers on. This demo moves the target
+	# in _process(), so the modifier has to run there too — set it to PHYSICS and
+	# the head is aiming at where the target was last physics tick, which reads
+	# as lag on exactly the fast-moving targets you were trying to track.
+	_skeleton.modifier_callback_mode_process = \
+		Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_IDLE
+
 func _build_skeleton() -> void:
 	for entry in BONES:
 		var index := _skeleton.add_bone(entry[0])

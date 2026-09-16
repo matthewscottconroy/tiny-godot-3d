@@ -66,7 +66,7 @@ project for the next revision.
 | `CSGBox3D.operation` (`UNION` / `SUBTRACTION`) | Adding and cutting |
 | `CSGShape3D.use_collision` | A greybox you can walk around in while you edit it |
 | `CSGCombiner3D.bake_static_mesh()` | Turning the finished blockout into an ordinary mesh |
-| `Rect2.intersects()` / `end` | The room arithmetic behind the plan |
+| `Rect2.end` / `position` / `size` | The room arithmetic behind the plan |
 
 ## Files
 
