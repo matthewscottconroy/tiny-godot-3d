@@ -16,6 +16,7 @@ func _ready() -> void:
 	test_heights_stay_within_the_amplitude()
 	test_the_ground_is_not_flat()
 	test_amplitude_scales_the_hills()
+	test_feature_size_sets_the_scale_of_the_hills()
 	test_normals_point_up_and_are_unit_length()
 	test_flat_ground_has_no_slope()
 	test_normals_lean_away_from_the_slope()
@@ -95,6 +96,27 @@ func test_amplitude_scales_the_hills() -> void:
 	high.amplitude = low.amplitude * 3.0
 	expect(is_equal_approx(high.height_at(4.0, 4.0), low.height_at(4.0, 4.0) * 3.0),
 		"three times the amplitude is three times the height, everywhere")
+
+func test_feature_size_sets_the_scale_of_the_hills() -> void:
+	print("feature size")
+	# feature_size is "hills roughly this many metres across", which is why the
+	# noise coordinate is divided by it rather than multiplied. Bigger features
+	# mean ground that changes more slowly as you walk over it; get the division
+	# the wrong way up and the setting does exactly the opposite of its name.
+	var small := TerrainField.new(7)
+	var large := TerrainField.new(7)
+	small.feature_size = 6.0
+	large.feature_size = 60.0
+	var small_change := 0.0
+	var large_change := 0.0
+	for i in 100:
+		var x := float(i) * 0.5
+		small_change += absf(small.height_at(x + 0.5, 0.0) - small.height_at(x, 0.0))
+		large_change += absf(large.height_at(x + 0.5, 0.0) - large.height_at(x, 0.0))
+	expect(large_change < small_change,
+		"bigger features make ground that changes more slowly (%.2f against %.2f)"
+		% [large_change, small_change])
+	expect(large_change > 0.0, "without flattening it into a plane")
 
 func test_normals_point_up_and_are_unit_length() -> void:
 	print("normals")

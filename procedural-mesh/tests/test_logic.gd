@@ -13,6 +13,7 @@ func _ready() -> void:
 	test_grid_is_flat_without_a_height_function()
 	test_height_function_is_applied()
 	test_normals_are_generated()
+	test_uvs_span_the_surface()
 	test_ring_closes()
 	test_ring_winding()
 	test_ring_has_thickness()
@@ -80,11 +81,20 @@ func test_grid_is_centred_and_sized() -> void:
 	var verts: PackedVector3Array = _arrays(mesh)[Mesh.ARRAY_VERTEX]
 	var min_x := INF
 	var max_x := -INF
+	var min_z := INF
+	var max_z := -INF
 	for v in verts:
 		min_x = minf(min_x, v.x)
 		max_x = maxf(max_x, v.x)
+		min_z = minf(min_z, v.z)
+		max_z = maxf(max_z, v.z)
 	expect(is_equal_approx(min_x, -5.0), "the grid starts at -size/2")
 	expect(is_equal_approx(max_x, 5.0), "and ends at +size/2")
+	# Both axes. The two rows that place a vertex are separate lines of code, so
+	# measuring only x leaves the z one free to be wrong — and a grid that is the
+	# right width and the wrong depth still looks like a grid.
+	expect(is_equal_approx(min_z, -5.0), "and the same in z, rather than only in x")
+	expect(is_equal_approx(max_z, 5.0), "at both ends of it")
 
 func test_grid_is_flat_without_a_height_function() -> void:
 	print("flat by default")
@@ -118,6 +128,39 @@ func test_normals_are_generated() -> void:
 	# normals would point down and the surface would be invisible from above.
 	expect(all_up, "a flat grid's normals point up, so it faces the sky")
 
+func test_uvs_span_the_surface() -> void:
+	print("uvs")
+	# A texture coordinate is a fraction of the way across the surface, so every
+	# one of them belongs in 0..1. Get the division the wrong way up and the
+	# mesh still builds, still lights, and still renders — with the texture
+	# either tiled dozens of times or stretched to a single colour, depending on
+	# which way the mistake went. Nothing but the numbers says which.
+	var n := 4
+	var uvs: PackedVector2Array = _arrays(MeshBuilder.grid(4.0, n))[Mesh.ARRAY_TEX_UV]
+	expect(uvs.size() > 0, "the grid carries texture coordinates at all")
+	var inside := true
+	for uv in uvs:
+		if uv.x < 0.0 or uv.x > 1.0 or uv.y < 0.0 or uv.y > 1.0:
+			inside = false
+	expect(inside, "and every one of them lies within 0..1")
+	# The corners pin the mapping down: first vertex at the origin of the
+	# texture, last at the far corner, so the sheet is used exactly once.
+	expect(uvs[0].is_equal_approx(Vector2.ZERO), "the first vertex sits at (0, 0)")
+	expect(uvs[uvs.size() - 1].is_equal_approx(Vector2.ONE),
+		"and the last at (1, 1), so the texture is spanned once rather than tiled")
+	# The row step is 1/n, which is what distinguishes dividing from multiplying.
+	expect(is_equal_approx(uvs[1].x, 1.0 / float(n)),
+		"one vertex along is one nth across the texture")
+
+	var ring_uvs: PackedVector2Array = _arrays(MeshBuilder.ring(2.0, 0.5, 8))[Mesh.ARRAY_TEX_UV]
+	var ring_inside := true
+	for uv in ring_uvs:
+		if uv.x < 0.0 or uv.x > 1.0:
+			ring_inside = false
+	expect(ring_inside, "the ring's u runs around the band, also within 0..1")
+	expect(is_equal_approx(ring_uvs[0].y, 0.0) and is_equal_approx(ring_uvs[1].y, 1.0),
+		"with v at the top and bottom edge of each segment")
+
 func test_ring_closes() -> void:
 	print("ring")
 	var mesh := MeshBuilder.ring(3.0, 1.0, 8)
@@ -137,6 +180,18 @@ func test_ring_closes() -> void:
 		if not is_equal_approx(Vector2(v.x, v.z).length(), 3.0):
 			radii_ok = false
 	expect(radii_ok, "every vertex sits on the radius")
+
+	# And at its own angle. Everything above is just as true of a "ring" whose
+	# segments all landed on the same spot — the radius is right, the counts are
+	# right, every vertex is used — so the angle is the only thing that says
+	# this is a circle rather than eight copies of one point.
+	var spread := true
+	for i in 8:
+		var angle := TAU * float(i) / 8.0
+		var wanted := Vector2(cos(angle), sin(angle)) * 3.0
+		if not Vector2(verts[i * 2].x, verts[i * 2].z).is_equal_approx(wanted):
+			spread = false
+	expect(spread, "and each segment is a full turn divided by the segment count round")
 
 func test_ring_has_thickness() -> void:
 	print("ring thickness")

@@ -148,6 +148,18 @@ MUTATIONS = [
     ("literal", re.compile(r"\bfalse\b"), "true"),
     ("arithmetic", re.compile(r"(?<=[\w\)\]]) \+ (?=[\w\(])"), " - "),
     ("arithmetic", re.compile(r"(?<=[\w\)\]]) - (?=[\w\(])"), " + "),
+    # Scaling, which the four above cannot reach. In 3D this is most of the
+    # arithmetic there is — a speed, a sensitivity, a delta, a normalisation —
+    # and swapping the two is a behaviour change essentially every time, so it
+    # asks a real question of a suite without manufacturing equivalent mutants
+    # the way rewriting a numeric constant would.
+    ("arithmetic", re.compile(r"(?<=[\w\)\]]) \* (?=[\w\(])"), " / "),
+    ("arithmetic", re.compile(r"(?<=[\w\)\]]) / (?=[\w\(])"), " * "),
+    # Accumulation. `_yaw -= x` and `position += step` are the shape most of the
+    # per-frame state in these demos is written in, and none of the patterns
+    # above match a compound assignment.
+    ("assignment", re.compile(r"(?<![+\-*/])\+=(?!=)"), "-="),
+    ("assignment", re.compile(r"(?<![+\-*/])-=(?!=)"), "+="),
 ]
 
 # Lines we must not touch: comments, annotations, class/extends declarations,

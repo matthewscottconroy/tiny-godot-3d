@@ -128,12 +128,23 @@ func test_range_matches_audibility() -> void:
 		"just inside the range it is audible")
 	expect(not Hearing.is_audible(reach, UNIT, MAX, Hearing.Model.INVERSE, -10.0),
 		"and at the range it is not")
+	# A threshold nothing ever falls below, so the search runs until the cutoff
+	# stops it. That is the only case where max_distance is what gets returned,
+	# and so the only one that notices when the guard picks the wrong limit.
+	expect(is_equal_approx(Hearing.range_of(UNIT, MAX, Hearing.Model.INVERSE, -400.0), MAX),
+		"a sound that never fades still stops carrying at the hard cutoff")
 
 func test_doppler_rises_when_approaching() -> void:
 	print("doppler")
 	expect(Hearing.doppler(20.0) > 1.0, "something coming towards you sounds higher")
 	expect(Hearing.doppler(-20.0) < 1.0, "something going away sounds lower")
 	expect(is_equal_approx(Hearing.doppler(0.0), 1.0), "and something stationary sounds the same")
+	# By the right amount. 20 m/s is a fast car, which is a couple of percent of
+	# a semitone — not the octave a ratio taken the wrong way up produces, which
+	# is also "higher" and passes every assertion above.
+	expect(is_equal_approx(Hearing.doppler(20.0), 1.0 / (1.0 - 20.0 / 343.0)),
+		"the shift is the closing speed as a fraction of the speed of sound")
+	expect(Hearing.doppler(20.0) < 1.1, "so a fast car shifts by a few percent, not an octave")
 
 func test_doppler_is_clamped() -> void:
 	print("supersonic")

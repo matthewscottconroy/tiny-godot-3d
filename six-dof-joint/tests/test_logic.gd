@@ -86,6 +86,11 @@ func test_a_shoulder() -> void:
 	var twist := shoulder.bounds("angular", DofSpec.Axis.Z)
 	var reach := shoulder.bounds("angular", DofSpec.Axis.X)
 	expect(twist.y < reach.y, "and it twists less than it reaches")
+	# Both are defaults on the factory, and "twists less than it reaches" stays
+	# true however far the reach goes. An arm that swings most of a full circle
+	# in every direction is not a shoulder, it is a windmill.
+	expect(reach.y < PI * 0.5, "a shoulder reaches less than a quarter turn each way")
+	expect(reach.y > 0.0 and twist.y > 0.0, "in both senses, rather than being locked")
 
 func test_the_node_you_dropped_in_unchanged() -> void:
 	print("straight out of the box")

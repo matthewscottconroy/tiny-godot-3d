@@ -194,6 +194,15 @@ func _check_the_readout() -> void:
 	expect(readout.text.contains("guard off"), "and that the guard is off")
 	expect(not readout.text.contains("nothing near"),
 		"and does not claim there is nothing near")
+
+	# near_precision_share() answers with a fraction and the status line reports
+	# a percentage. Printing the fraction where the percentage belongs turns
+	# "the first metre uses 87% of it" into "uses 0% of it" — a different claim
+	# entirely, and the one sentence this whole demo exists to make.
+	var share := NearPlane.near_precision_share(_camera().near, _camera().far)
+	expect(share > 0.01 and share <= 1.0, "the near metre's share is a fraction of the range")
+	expect(status.text.contains("%.0f%%" % (share * 100.0)),
+		"and the status line states it as that fraction turned into a percentage")
 	expect(status.text.contains("2x"),
 		"the status line prices halving the near plane at twice the precision (%s)" % status.text)
 

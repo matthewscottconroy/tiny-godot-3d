@@ -14,9 +14,20 @@ whose scripts do not parse, or whose scene warns, now fails immediately. It does
 not close the subtler one, where the demo runs fine and is quietly wrong.
 
 `tools/mutate.py` measures that. It makes a small deliberate change to a demo's
-real scripts — flips a comparison, swaps `and` for `or`, negates a constant — and
-re-runs only the logic suite. If the suite still passes, that mutation
-**survived**, and nothing in the suite depends on the mutated behaviour.
+real scripts — flips a comparison, swaps `and` for `or`, turns a `*` into a `/`,
+reverses a `+=` — and re-runs only the logic suite. If the suite still passes,
+that mutation **survived**, and nothing in the suite depends on the mutated
+behaviour.
+
+The operators are chosen to change *behaviour* rather than to break the script:
+comparisons, equality, `and`/`or`, `true`/`false`, `+`/`-`, `*`/`/`, and `+=`/`-=`.
+Rewriting a numeric constant is deliberately not among them. It would
+manufacture equivalent mutants — a tweaked HUD offset that no test could ever
+legitimately catch — and a score with unkillable survivors in it stops meaning
+anything. Scaling and accumulation give the same signal without that cost:
+a speed, a sensitivity, a `delta`, a normalisation is most of the arithmetic in
+a 3D demo, and swapping `*` for `/` changes what the demo does essentially
+every time.
 
 ```bash
 tools/mutate.py                      # every demo
@@ -95,11 +106,50 @@ an `aim()` that would have passed every assertion by returning the identity
 basis. All of them were real. All of them were fixed by assertions that state a
 number.
 
-At twenty-five projects the floor is:
+At twenty-five projects the floor was:
 
 ```
 144/144 mutations caught (100%)
 25 suites caught everything, 0 caught nothing
+```
+
+### Widening the operator set, and what it found
+
+A score sitting at 100% has stopped asking questions. It can still catch a suite
+getting weaker, which is what the ratchet is for, but it cannot find anything
+new — so the honest move at that point is to make the question harder rather
+than to admire the answer.
+
+Adding `*`/`/` and `+=`/`-=` did that, and the first sweep with them dropped the
+collection to **336/352 (95%)**. Sixteen survivors, in twelve demos that had all
+been at 100% the day before. They fell into three shapes, and the shapes are
+more useful than the list:
+
+- **An axis nobody looked at.** `camera-shake-3d` bounded the shake on x, y and
+  roll; the depth offset and the pitch/yaw rotation were unchecked, so three of
+  the six lines that place the camera could scale however they liked.
+  `procedural-mesh` measured its grid's extent in x and not in z.
+  `character-controller-3d` drove its motor along -Z, leaving the line that
+  accelerates x with nothing to show a mistake in.
+- **A magnitude behind a direction.** `vehicle-3d` asserted that braking asks
+  for brake force, never how much. `ragdoll-3d` checked the recovery blend was
+  between 0 and 1, which is true of any curve at all. `audio-3d` checked that an
+  approaching source sounds higher — also true of one shifted by an octave.
+- **A test constant that made the mutation equivalent.** `cinematic-camera`
+  blended over exactly 1.0 seconds, where `delta / duration` and
+  `delta * duration` are the same number. `editor-tool-3d` built the default two
+  rails, where the fraction spacing them up the post is a division by one. Both
+  suites were correct and thorough; both were blind at exactly the value they
+  had picked.
+
+The third shape is the one worth remembering, because it is invisible in review:
+the assertion is right, the code is right, and the test still proves nothing.
+
+With those closed, at six mutations per demo:
+
+```
+352/352 mutations caught (100%)
+59 suites caught everything, 0 caught nothing
 ```
 
 100% is not a target to defend at any cost — a score chased by writing
