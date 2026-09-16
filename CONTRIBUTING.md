@@ -7,9 +7,10 @@ review.
 
 ## The shape of a demo
 
-**One demo teaches one thing, completely.** The average demo is about 100 lines
-of GDScript. If yours needs three files and a diagram to follow, it is probably
-two demos.
+**One demo teaches one thing, completely.** The median demo is about 200 lines
+of GDScript across `scripts/`, and `tools/check_docs.py` fails one over 250
+unless it carries a `# size-exempt: <reason>`. Five demos do. If yours needs
+three files and a diagram to follow, it is probably two demos.
 
 **Readability beats reusability.** If turning the mechanism into a generic
 component would make the file harder to read as a lesson, don't. Package it
