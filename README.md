@@ -1,6 +1,6 @@
 # Tiny Godot 3D
 
-A collection of **58 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
+A collection of **59 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
 
 Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7.1 — every
 demo passes on all three. Every demo is **3D** — 2D lives in its own
@@ -11,7 +11,7 @@ demos and shares this repository's conventions and tooling.
 **Godot 4.5.1 – 4.7.1** — 58/58 demos passing. [Full table](docs/COMPATIBILITY.md)
 <!-- /compat-badge -->
 
-> **Status: growing.** Fifty-eight demos so far. The harness, conventions,
+> **Status: growing.** Fifty-nine demos so far. The harness, conventions,
 > tooling and CI are in place, so the shape is settled — what is missing is
 > breadth. The gaps are enumerated in [docs/GAPS.md](docs/GAPS.md), and anything
 > on that list is fair game to contribute.
@@ -159,6 +159,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [procedural-mesh](procedural-mesh) | Building geometry with `SurfaceTool`: vertices, winding order, indices, and normals. |
 | [noise-terrain](noise-terrain) | A heightmap from FastNoiseLite turned into a mesh, with slope-shaded regions and a seed you can change. |
 | [terrain-splatting](terrain-splatting) | Texturing terrain by slope and height, with weights that add up and edges that do not band. |
+| [triplanar-mapping](triplanar-mapping) | Texturing a cliff without the vertical smearing a flat UV gives it, by projecting from three axes and blending on the normal. |
 | [multimesh](multimesh) | Ten thousand instances in one draw call with MultiMeshInstance3D, and a distance cull that costs nothing. |
 
 ### 💡 Rendering & Light
@@ -201,16 +202,23 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 
 ## What's next
 
-The 2D collection's categories suggest the shape this one should grow into, and
-[docs/TAGS.md](docs/TAGS.md) shows the same thing from the other side: the tags
-with no demos are the subjects nothing here covers yet. The gaps that matter
-most, roughly in order:
+Every subject this section used to list has since been built — blend spaces,
+root motion, CSG blockouts, level streaming, obstacles, terrain collision,
+render-to-texture, volumetric fog, screen-reading shaders, vehicles, continuous
+collision, `Generic6DOFJoint3D` and client prediction all have demos now. What
+follows is what is actually left, roughly in order of how much it would be
+missed:
 
-- **Animation** — `AnimationTree` blend spaces and root motion, over the clips and rigs already here
-- **Level building** — CSG blockouts, level streaming, `NavigationObstacle3D`, terrain collision
-- **Rendering** — render-to-texture, volumetric fog, a shader that reads the screen
-- **Physics** — vehicles, continuous collision detection, `Generic6DOFJoint3D`
-- **Multiplayer** — authority and prediction, on top of what `multiplayer-3d` starts
+- **Multiplayer** — lag compensation, and `MultiplayerSynchronizer` as the
+  built-in version of what [multiplayer-3d](multiplayer-3d) does by hand
+- **Animation** — two skeleton modifiers stacked on one rig, and root motion
+  that turns as well as steps
+- **Rendering** — `LightmapGI`, and what baking buys over the real-time lights
+  in [lights-and-shadows](lights-and-shadows)
+- **Physics** — active ragdolls, and tunnelling for a `CharacterBody3D` rather
+  than the rigid bodies [continuous-collision](continuous-collision) covers
+- **Accessibility** — screen readers, the half that
+  [menu-navigation](menu-navigation) does not reach
 
 [docs/GAPS.md](docs/GAPS.md) is the full list, with what each demo would need to
 show.
@@ -230,4 +238,4 @@ than translating the 2D ones.
 
 ---
 
-*58 demos. Each teaches one thing, completely.*
+*59 demos. Each teaches one thing, completely.*

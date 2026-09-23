@@ -35,8 +35,6 @@ example.
 - **Streaming the scenes themselves** — [level-streaming](../level-streaming)
   decides *which* chunks; loading them off the main thread with
   [threaded-loading](../threaded-loading) is the other half
-- **Triplanar mapping** — the step past [terrain-splatting](../terrain-splatting):
-  textures on a cliff face that are not stretched vertically
 
 ## Rendering
 
