@@ -87,6 +87,8 @@ measures and how to read a report.
 | `tools/build_index.py --check` | A stale API index or stale related-demo links |
 | `tools/build_tags.py --check` | Concept tags that no longer match the source they are derived from |
 | `tools/mutate.py --check` | A test suite that got weaker (weekly, not per-push) |
+| `tools/leakcheck.sh` | A demo that leaks objects at shutdown (weekly; run-tests.sh allowlists the warning) |
+| `tools/check_gallery.py` | A demo whose captured frame is empty — lit, and still showing nothing (with the screenshots job) |
 | `gdlint` | Dead arguments, mixed tabs/spaces, tautological comparisons, naming |
 
 `tools/preflight.sh` reports which of the repository's pipelines can run on your

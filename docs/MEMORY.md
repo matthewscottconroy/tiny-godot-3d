@@ -21,6 +21,14 @@ VERBOSE=1 tools/leakcheck.sh <demo>   # show clean results too
 
 **Current state: 59 projects, all clean, two reports allowlisted as engine-side.**
 
+That state is now gated rather than merely recorded. `run-tests.sh` cannot do it:
+it allowlists the "ObjectDB instance leaked at exit" warning, because the two
+engine-side audio reports below would otherwise fail every run — so a leak
+introduced by a demo would arrive as the same warning and be waved through
+alongside them. The `leaks` job in `.github/workflows/tests.yml` runs this script
+on the mutation job's schedule, weekly and on dispatch rather than per push,
+because it is deliberately serial and too slow to gate a branch.
+
 The allowlist is the part to keep honest: every entry has to be justified with a
 reproduction in a scene containing none of the demo's code, and an allowlist that
 grows without that evidence is how a check stops being read.

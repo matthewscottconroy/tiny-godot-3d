@@ -72,6 +72,13 @@ jobs:
           export PATH="$HOME/godot:$PATH"
           ./tools/screenshots.sh
 
+      - name: Check no demo rendered an empty frame
+        # The pixels, not the scene file. check_docs.py already refuses a scene
+        # with no light in it; this catches the ones that are lit and still show
+        # nothing — a camera too far away, a mesh with no surface. It runs here
+        # rather than in the push job because it needs a capture to look at.
+        run: ./tools/check_gallery.py
+
       - name: Build the gallery
         run: ./tools/build_gallery.py
 

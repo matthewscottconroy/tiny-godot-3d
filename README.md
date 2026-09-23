@@ -94,6 +94,7 @@ tools/build_index.py      # API cross-reference and related-demo links
 tools/mutate.py           # do the suites actually catch bugs? (docs/TEST_INTEGRITY.md)
 tools/leakcheck.sh        # demos that leak objects at shutdown (docs/MEMORY.md)
 tools/screenshots.sh      # capture one PNG per demo (needs xvfb)
+tools/check_gallery.py    # demos that captured an empty frame
 tools/build_gallery.py    # write docs/GALLERY.md from those screenshots
 tools/export_web.sh       # export demos for the browser (needs export templates)
 ```
