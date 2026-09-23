@@ -45,6 +45,17 @@ the portal simply not working.
 is the line between a portal and a black rectangle, and there is no error to
 explain its absence.
 
+**The glass has to face the way the maths does.** `side_of()` calls the
+portal's local -Z the front, and everything follows it: which way you are sent,
+whether the view is worth rendering. A `QuadMesh` faces +Z. Drop one in
+unrotated and the single face the renderer draws is the one on the side the
+maths calls the back, so backface culling hides the portal from the only side
+you are ever meant to look from: the demo runs, the readout cheerfully says
+"portal A is facing you", and there is nothing there. Turning the quad round is
+the fix rather than switching culling off, because a quad seen from behind
+shows its texture mirrored — the portal would be visible and quietly wrong,
+left for right, which is a great deal harder to notice than an invisible one.
+
 **Do not draw a portal you are behind.** It costs an entire extra scene render
 to produce something nobody can see. Press V to turn the check off and watch the
 readout admit it.

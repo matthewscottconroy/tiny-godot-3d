@@ -174,9 +174,29 @@ func _process(_delta: float) -> void:
 			add_child(_scene)
 		4:
 			_check_the_views()
+			_check_the_surfaces_face_the_front()
 		6:
 			_walk_through()
 			_report()
+
+## The drawn face has to be the one you can stand in front of.
+##
+## side_of() calls the portal's local -Z the front, and everything else follows
+## it: which way you are teleported, whether the view renders at all. A QuadMesh
+## faces +Z, so a surface dropped in unrotated is drawn on the side the maths
+## calls the back — and backface culling then hides it from the only side you
+## are ever meant to look from. The demo renders, the suite passes, the portal
+## is invisible. Rotating it the other way instead of switching culling off is
+## what keeps the view unmirrored.
+func _check_the_surfaces_face_the_front() -> void:
+	print("which way the glass faces")
+	for name in ["PortalA", "PortalB"]:
+		var portal: Node3D = _scene.get_node(name)
+		var surface: MeshInstance3D = _scene.get_node(name + "/Surface")
+		var drawn_face := surface.global_transform.basis.z.normalized()
+		var front := -portal.global_transform.basis.z.normalized()
+		expect(drawn_face.dot(front) > 0.99,
+			"%s's surface is drawn on the side side_of() calls the front" % name)
 
 func _check_the_views() -> void:
 	var view: SubViewport = _scene.get_node("PortalA/View")
