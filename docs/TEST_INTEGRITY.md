@@ -148,9 +148,33 @@ the assertion is right, the code is right, and the test still proves nothing.
 With those closed, at six mutations per demo:
 
 ```
-352/352 mutations caught (100%)
-59 suites caught everything, 0 caught nothing
+358/358 mutations caught (100%)
+60 suites caught everything, 0 caught nothing
 ```
+
+### The floor moves when you add a demo
+
+Which mutants a demo gets is a random sample, and the RNG is shared across the
+whole run — so adding a single demo shifts the stream and every demo after it
+draws a different six. Adding `triplanar-mapping` did exactly that: three
+mutants surfaced in `volumetric-fog` and `wave-shader`, suites nobody had
+touched, that the previous sample had simply never hit. All three were real, and
+all three were the same shape — a `*` that could be a `/` in a constant the
+suite had only ever compared against itself.
+
+The trap is what happens next. `--update` recorded 99.2% over a 100% floor
+without comment, which is how a ratchet quietly stops being one, and the note in
+the baseline file saying never to lower it was the only thing enforcing it. It
+now refuses:
+
+```
+refusing to lower the baseline from 100.0% to 99.2%.
+      Run with --verbose to see what survived and fix it, or
+      --update --force if the drop is genuinely intended.
+```
+
+So a new demo arriving with a lower score is a prompt to go and read what
+survived, which is the useful reaction, rather than a number to be re-recorded.
 
 100% is not a target to defend at any cost — a score chased by writing
 assertions about the mutations themselves would be worthless. It is where this

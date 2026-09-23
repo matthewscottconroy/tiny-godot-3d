@@ -54,6 +54,16 @@ func test_a_flat_sea() -> void:
 	expect(is_zero_approx(field.height_at(3.0, 4.0, 1.0)), "a field with no waves is flat")
 	expect(is_zero_approx(field.crest_height()), "and has no crest")
 
+	# swell scales the whole surface, and it defaults to 1.0 — where multiplying
+	# by it and dividing by it are the same number, so every assertion that
+	# leaves it alone says nothing about which the crest does.
+	var swelled := WaveField.new()
+	var calm := swelled.crest_height()
+	swelled.swell = 2.5
+	expect(absf(swelled.crest_height() - calm * 2.5) < 0.0001,
+		"a heavier swell raises the crest in proportion, rather than flattening it")
+	expect(swelled.crest_height() > calm, "so a rougher sea has further to rise")
+
 func test_the_surface_moves_over_time() -> void:
 	print("motion")
 	var field := WaveField.new()

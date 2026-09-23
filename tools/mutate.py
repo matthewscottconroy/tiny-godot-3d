@@ -418,6 +418,8 @@ def main():
                         help="fail if the score dropped below the recorded baseline")
     parser.add_argument("--update", action="store_true",
                         help="record the current score as the new baseline")
+    parser.add_argument("--force", action="store_true",
+                        help="with --update, allow recording a LOWER baseline")
     args = parser.parse_args()
 
     demos = args.demos or sorted(os.path.dirname(p) for p in glob.glob("*/project.godot"))
@@ -492,6 +494,27 @@ def main():
         print("run was aborted early — baseline untouched", file=sys.stderr)
         return 4
     if args.update:
+        # The baseline is a floor, and its own note says never to lower it — but
+        # --update would happily do exactly that, which is how a ratchet stops
+        # being one. It is an easy mistake to make honestly: the sample is drawn
+        # at random, so adding a single demo shifts the RNG stream and draws
+        # mutants the previous sample never hit. That is what happened at 60
+        # projects: three survivors appeared in suites nobody had touched, and
+        # an unguarded --update wrote 99.2% over a 100% floor.
+        #
+        # Those three were real gaps worth fixing. The point is that recording
+        # them as the new normal has to be a decision rather than a side effect.
+        if not args.force and os.path.exists(BASELINE):
+            with open(BASELINE, encoding="utf-8") as handle:
+                previous = float(json.load(handle).get("ratio", 0.0))
+            current = total_killed / tried if tried else 0.0
+            if current < previous:
+                print("refusing to lower the baseline from %.1f%% to %.1f%%."
+                      % (100 * previous, 100 * current), file=sys.stderr)
+                print("      Run with --verbose to see what survived and fix it,"
+                      " or --update --force if the drop is genuinely intended.",
+                      file=sys.stderr)
+                return 1
         _write_baseline(total_killed, tried, len(demos))
         return 0
     if args.check:
