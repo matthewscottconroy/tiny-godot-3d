@@ -51,6 +51,14 @@ answered once; the opposite guess is worse, because starting against a wall
 would put the camera through it, and this way the worst case is one frame too
 far out that the instant pull-in fixes on the next.
 
+The neighbouring demos do not need this, and the reason is worth knowing:
+`RayCast3D` has `force_raycast_update()` and `ShapeCast3D` has
+`force_shapecast_update()`, so [two-bone-ik](../two-bone-ik) and
+[shape-cast-3d](../shape-cast-3d) can simply demand an answer before reading
+one. `SpringArm3D` has no equivalent — it sweeps when the physics step says so
+and not before — so with a spring arm the only options are to wait for it or to
+guess, and guessing "clear" is the cheaper mistake.
+
 **The character has to be excluded by hand.** The sweep starts at head height,
 right beside the collider it is supposed to be looking past, so pitch the camera
 down and the first thing it finds is the player: the arm collapses and the view
