@@ -90,6 +90,27 @@ func test_everything_lands_inside_the_field() -> void:
 			outside += 1
 	expect(outside == 0, "no instance escapes the area, jitter included")
 
+	# And the jitter is worth having. A smaller one stays inside the field and
+	# one per cell just as happily, so every assertion here holds for a scatter
+	# that is really a grid — the one thing it must not look like.
+	#
+	# Position within a cell rather than distance from a recovered centre: an
+	# unjittered grid puts every instance at exactly half a cell, so the spread
+	# away from that IS the jitter, and it cannot be confused by a point that
+	# wandered into its neighbour.
+	# Per axis, not across both. They are separate lines in the component, and a
+	# max over the pair lets a working x hide a broken z entirely.
+	var worst_x := 0.0
+	var worst_z := 0.0
+	for item in field.transforms(100):
+		var fx := fposmod((item.origin.x + half) / field.cell, 1.0)
+		var fz := fposmod((item.origin.z + half) / field.cell, 1.0)
+		worst_x = maxf(worst_x, absf(fx - 0.5))
+		worst_z = maxf(worst_z, absf(fz - 0.5))
+	expect(worst_x > 0.3,
+		"something sits a real part of a cell off its centre in x (%.2f)" % worst_x)
+	expect(worst_z > 0.3, "and in z (%.2f)" % worst_z)
+
 func test_one_instance_per_cell() -> void:
 	print("no clumping")
 	var field := _field()
@@ -134,6 +155,18 @@ func test_scales_stay_in_range() -> void:
 	expect(smallest >= 0.5 - 0.001, "nothing is smaller than min_scale")
 	expect(largest <= 2.0 + 0.001, "nothing is larger than max_scale")
 	expect(largest - smallest > 0.5, "and the range is actually used")
+
+	# A range that is not its own reciprocal. 1/[0.5, 2.0] is [0.5, 2.0] again,
+	# so a scale applied upside down lands inside the bounds checked above and
+	# every instance is simply the wrong size.
+	var lopsided := _field()
+	lopsided.min_scale = 1.0
+	lopsided.max_scale = 3.0
+	var under := 0
+	for item in lopsided.transforms(100):
+		if item.basis.get_scale().y < 1.0 - 0.001:
+			under += 1
+	expect(under == 0, "nothing comes out smaller than a min_scale of 1.0 (%d did)" % under)
 
 func test_a_height_function_places_them_on_the_ground() -> void:
 	print("on the ground")

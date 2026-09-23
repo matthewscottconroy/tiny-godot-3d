@@ -19,6 +19,7 @@ func _ready() -> void:
 	test_a_single_sample()
 	test_interpolating_between_two()
 	test_rendering_the_past()
+	test_a_long_delay_keeps_enough_history_to_read()
 	test_running_dry_holds_rather_than_guesses()
 	test_out_of_order_samples_are_refused()
 	test_duplicates_are_refused()
@@ -73,6 +74,18 @@ func test_interpolating_between_two() -> void:
 	expect(is_equal_approx(buffer.sample(1.6).x, 5.0), "halfway between two packets is halfway")
 	expect(is_equal_approx(buffer.sample(1.35).x, 2.5), "and a quarter of the way, a quarter")
 
+	# Packets that are not exactly a second apart. At a span of 1.0 the weight is
+	# the numerator either multiplied or divided by it, so an interpolation that
+	# scales the wrong way lands in precisely the right place — and twenty
+	# updates a second is the realistic case, not one.
+	var tight := _buffer()
+	tight.push(1.0, Vector3.ZERO)
+	tight.push(1.5, Vector3(10, 0, 0))
+	expect(is_equal_approx(tight.sample(1.35).x, 5.0),
+		"halfway across a half-second span is still halfway (%.2f)" % tight.sample(1.35).x)
+	expect(is_equal_approx(tight.sample(1.225).x, 2.5),
+		"and a quarter of the way across it is a quarter")
+
 func test_rendering_the_past() -> void:
 	print("the delay")
 	var buffer := _buffer()
@@ -83,6 +96,38 @@ func test_rendering_the_past() -> void:
 	# a delay ago, which is the only moment it has data on both sides of.
 	expect(delayed.x < 10.0, "at now, the peer is drawn where it was a moment ago")
 	expect(is_equal_approx(delayed.x, 9.0), "exactly one delay behind the newest packet")
+
+func test_a_long_delay_keeps_enough_history_to_read() -> void:
+	print("history against delay")
+	# The trim keeps the larger of `history` and twice the delay. Halve that
+	# instead and a client rendering far enough in the past has its own samples
+	# thrown away underneath it — it runs dry while packets are still arriving.
+	# A history *shorter* than the delay, which is the case the `delay * 2`
+	# margin exists for: trim to `history` alone and the buffer throws away the
+	# samples it is about to read, so it runs dry while packets keep arriving.
+	var buffer := StateBuffer.new()
+	buffer.delay = 0.8
+	buffer.history = 0.2
+	for i in 25:
+		buffer.push(float(i) * 0.1, Vector3(float(i), 0, 0))
+	var now := 2.4
+	expect(buffer.is_interpolating(now),
+		"a delay wider than the history still has samples either side to read")
+	expect(buffer.sample(now).x < 24.0,
+		"so it draws the past rather than snapping to the newest packet")
+	# Enough samples left to span the delay at a packet every 0.1s. A trim that
+	# slices from the wrong end keeps a handful off the back instead, which
+	# still interpolates near `now` and falls over the moment you look further.
+	expect(buffer.count() >= 16,
+		"the trim keeps back to at least twice the delay (%d samples)" % buffer.count())
+	expect(buffer.is_interpolating(now - 0.5),
+		"including far enough back to read half a second earlier")
+
+	# push() reports whether it accepted, and callers count on it — a buffer that
+	# claims to have refused everything looks like a dead connection.
+	var fresh := StateBuffer.new()
+	expect(fresh.push(1.0, Vector3.ZERO), "a first packet is accepted, and says so")
+	expect(fresh.push(2.0, Vector3(1, 0, 0)), "and so is a newer one")
 
 func test_running_dry_holds_rather_than_guesses() -> void:
 	print("running dry")
