@@ -184,5 +184,13 @@ All six are required, and `tools/check_docs.py` enforces their presence:
   cannot check anything at all.
 - Type the things that matter. `var x := 5` is fine; `var x := some_dictionary[k]`
   will not compile, because Godot refuses to infer from a Variant.
+- A hand-written `Transform3D` in a `.tscn` is stored **row-major**, while
+  `basis.x` / `basis.y` / `basis.z` in GDScript are the **columns**. Writing the
+  three basis vectors into the file in the order you get them gives you the
+  transpose — which is a valid rotation, so nothing errors and the camera simply
+  faces somewhere else. `Transform3D(1, 2, 3, 4, 5, 6, 7, 8, 9, ...)` loads back
+  as `basis.x == (1, 4, 7)`. Easiest to avoid entirely: place cameras with
+  `look_at()` in `_ready()`, which is also self-documenting about what they are
+  meant to be pointed at.
 - Comments explain *why*, not *what*. The code already says what.
 - Prefer showing the mechanism over hiding it behind a helper.

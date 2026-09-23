@@ -51,9 +51,6 @@ example.
 
 ## Systems
 
-- **Lag compensation** — the server rewinding to where a client *saw* things
-  when it decides whether a shot hit, which is the other half of
-  [client-prediction](../client-prediction)
 - **`MultiplayerSynchronizer`** — the built-in version of the same job
 - **Screen readers** — the half of accessibility that
   [menu-navigation](../menu-navigation) does not cover: telling the player what

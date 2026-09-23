@@ -142,6 +142,8 @@ ones where you are looking for *the* example rather than *an* example.
 | `ResourceLoader.load_threaded_get_status()` | [threaded-loading](../threaded-loading) |
 | `ResourceLoader.load_threaded_request()` | [threaded-loading](../threaded-loading) |
 | `ResourceSaver.save()` | [save-load-3d](../save-load-3d) |
+| `Rewind.hits()` | [lag-compensation](../lag-compensation) |
+| `Rewind.seen_at()` | [lag-compensation](../lag-compensation) |
 | `RoomPlan.centre_of()` | [csg-blockout](../csg-blockout) |
 | `RoomPlan.door_between()` | [csg-blockout](../csg-blockout) |
 | `RoomPlan.door_is_horizontal()` | [csg-blockout](../csg-blockout) |
@@ -233,10 +235,10 @@ ones where you are looking for *the* example rather than *an* example.
 | `Input.get_vector()` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [multiplayer-3d](../multiplayer-3d), [orbit-camera](../orbit-camera), [spring-arm-camera](../spring-arm-camera) |
 | `Input.is_key_pressed()` | [character-controller-3d](../character-controller-3d), [first-person-controller](../first-person-controller), [screen-shader](../screen-shader), [vehicle-3d](../vehicle-3d) |
 | `InputMap.has_action()` | [device-glyphs](../device-glyphs), [input-remapping](../input-remapping) |
-| `MeshInstance3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d) _(+25 more)_ |
+| `MeshInstance3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d) _(+26 more)_ |
 | `NavigationAgent3D` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
 | `NavigationRegion3D` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
-| `Node3D` | [accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing) _(+51 more)_ |
+| `Node3D` | [accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing) _(+52 more)_ |
 | `PhysicsRayQueryParameters3D` | [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking) |
 | `PhysicsRayQueryParameters3D.create()` | [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking) |
 | `RayCast3D` | [shape-cast-3d](../shape-cast-3d), [two-bone-ik](../two-bone-ik) |
@@ -255,4 +257,4 @@ ones where you are looking for *the* example rather than *an* example.
 
 ---
 
-_237 APIs across 59 demos._
+_239 APIs across 60 demos._

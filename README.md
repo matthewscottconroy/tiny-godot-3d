@@ -1,6 +1,6 @@
 # Tiny Godot 3D
 
-A collection of **59 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
+A collection of **60 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
 
 Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7.1 — every
 demo passes on all three. Every demo is **3D** — 2D lives in its own
@@ -11,7 +11,7 @@ demos and shares this repository's conventions and tooling.
 **Godot 4.5.1 – 4.7.1** — 58/58 demos passing. [Full table](docs/COMPATIBILITY.md)
 <!-- /compat-badge -->
 
-> **Status: growing.** Fifty-nine demos so far. The harness, conventions,
+> **Status: growing.** Sixty demos so far. The harness, conventions,
 > tooling and CI are in place, so the shape is settled — what is missing is
 > breadth. The gaps are enumerated in [docs/GAPS.md](docs/GAPS.md), and anything
 > on that list is fair game to contribute.
@@ -198,6 +198,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [threaded-loading](threaded-loading) | Loading scenes on a background thread with a progress bar, instead of freezing the game with load(). |
 | [multiplayer-3d](multiplayer-3d) | Two peers over ENet, and the interpolation buffer that makes ten updates a second look smooth. |
 | [client-prediction](client-prediction) | Moving before the server answers, and putting it right when the answer disagrees. |
+| [lag-compensation](lag-compensation) | The server rewinding the world to where a shooter actually saw it, so a hit does not depend on their ping. |
 | [accessibility-3d](accessibility-3d) | Reduced motion, subtitle scaling and colour-blind-safe cue palettes, held in one options object everything else reads. |
 
 ## What's next
@@ -209,8 +210,8 @@ collision, `Generic6DOFJoint3D` and client prediction all have demos now. What
 follows is what is actually left, roughly in order of how much it would be
 missed:
 
-- **Multiplayer** — lag compensation, and `MultiplayerSynchronizer` as the
-  built-in version of what [multiplayer-3d](multiplayer-3d) does by hand
+- **Multiplayer** — `MultiplayerSynchronizer`, the built-in version of what
+  [multiplayer-3d](multiplayer-3d) does by hand
 - **Animation** — two skeleton modifiers stacked on one rig, and root motion
   that turns as well as steps
 - **Rendering** — `LightmapGI`, and what baking buys over the real-time lights
@@ -238,4 +239,4 @@ than translating the 2D ones.
 
 ---
 
-*59 demos. Each teaches one thing, completely.*
+*60 demos. Each teaches one thing, completely.*
