@@ -2,10 +2,18 @@ name: web gallery
 
 # Exports the demos to the web and publishes a playable gallery to GitHub Pages.
 #
-# STATUS: unvalidated. The export pipeline needs Godot's web export templates,
-# which were not available where this was written, so it has never run end to
-# end. It is manual-dispatch only — it cannot break the normal CI — and the
-# first run should be treated as a bring-up exercise rather than a deploy.
+# Validated end to end against Godot 4.7: 58 demos exported, 1 skipped
+# (multiplayer-3d, whose ENet transport a browser cannot open), 0 failed.
+#
+# The whole gallery is about 42MB, of which 38MB is one shared copy of the
+# engine and roughly 4MB is the 58 demos put together. That sharing is not a
+# nicety: Godot emits a complete 37.7MB runtime beside every export, identical
+# every time, so the naive layout is 2.2GB against a GitHub Pages limit of 1GB
+# and cannot deploy at all. tools/export_web.sh lifts it into _engine/ and
+# repoints each demo's loader. The size guard below is there so that if the
+# sharing ever breaks, it fails here rather than at the Pages upload.
+#
+# Still manual-dispatch only, so it cannot break the normal CI.
 #
 # Before enabling: Settings → Pages → Source → GitHub Actions.
 
@@ -56,6 +64,25 @@ jobs:
 
       - name: Build the landing page
         run: ./tools/build_web_index.py
+
+      - name: Check the engine is still shared
+        # One copy of the runtime, not fifty-eight. Measured at ~42MB; 200MB
+        # leaves room for the gallery to grow while still failing long before
+        # the 1GB Pages limit, and failing here says why rather than leaving a
+        # rejected upload to be interpreted.
+        run: |
+          size_mb=$(du -sm build/web | cut -f1)
+          engines=$(find build/web -name 'index.wasm' | wc -l)
+          echo "gallery is ${size_mb}MB across $(ls -d build/web/*/ | wc -l) directories, ${engines} engine copies"
+          if [ "$engines" -ne 1 ]; then
+            echo "::error::expected exactly one shared index.wasm, found ${engines} —" \
+                 "the runtime is being duplicated per demo and the site will not fit on Pages"
+            exit 1
+          fi
+          if [ "$size_mb" -gt 200 ]; then
+            echo "::error::gallery is ${size_mb}MB, over the 200MB guard"
+            exit 1
+          fi
 
       - name: Upload the build
         uses: actions/upload-artifact@v4
