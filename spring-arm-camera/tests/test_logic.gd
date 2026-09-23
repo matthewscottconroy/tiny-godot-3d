@@ -12,6 +12,7 @@ var _fail := 0
 var _frame := 0
 var _scene: Node3D = null
 var _probe: SpringArm3D = null
+var _shortest_on_spawn := INF
 var _blocker: StaticBody3D = null
 
 func _ready() -> void:
@@ -192,6 +193,15 @@ func _build_exclusion_probe() -> void:
 
 func _physics_process(_delta: float) -> void:
 	_frame += 1
+
+	# Watch the camera over the frames right after the scene loads. SpringArm3D
+	# answers 0 until it has swept once, and a driver that believes that number
+	# yanks the camera to its minimum and then eases it out — a second of
+	# spring-out at the start of every single run, with nothing logged.
+	if _scene != null and _frame <= 6:
+		var spawn_camera: Camera3D = _scene.get_node("Pivot/Camera3D")
+		_shortest_on_spawn = minf(_shortest_on_spawn, spawn_camera.position.z)
+
 	match _frame:
 		1:
 			print("the real arm")
@@ -203,6 +213,9 @@ func _physics_process(_delta: float) -> void:
 			var arm: SpringArm3D = _scene.get_node("Pivot/SpringArm3D")
 			expect(is_equal_approx(arm.get_hit_length(), arm.spring_length),
 				"in the open the arm reports its full length")
+			expect(is_equal_approx(_shortest_on_spawn, arm.spring_length),
+				"and the camera sat at that length from the first frame, rather "
+				+ "than springing out from the minimum (shortest %.2f)" % _shortest_on_spawn)
 			# Back the target up towards the wall the scene puts at z = 9, so
 			# the camera — which sits behind the target — ends up inside it.
 			_scene.get_node("Target").position = Vector3(0.0, 0.7, 7.5)

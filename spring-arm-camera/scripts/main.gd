@@ -24,6 +24,7 @@ var _yaw := 0.0
 var _pitch := 0.35
 var _length := 6.0
 var _orbiting := false
+var _swept := false               ## has the arm actually run a sweep yet?
 
 func _ready() -> void:
 	_hint.text = "Arrows move the target   hold right mouse to orbit   walk behind a wall"
@@ -61,7 +62,20 @@ func _physics_process(delta: float) -> void:
 	# SpringArm3D sweeps its shape backwards every physics frame and reports how
 	# far it got. That is the whole collision query — no ray to write, and the
 	# only exclusion to manage is the character, set once in _ready().
-	var allowed := _arm.get_hit_length()
+	#
+	# Except on the very first physics frame, where it has not swept yet and
+	# answers 0. That is "no answer", not "blocked at zero metres" — an arm
+	# alone in an empty scene says it too — and believing it costs a second of
+	# every run: the instant pull-in rate takes the camera straight to
+	# MIN_LENGTH and then eases it back out. Nothing errors and nothing warns,
+	# so it reads as a deliberate little zoom-out on spawn.
+	#
+	# Assume clear until the arm has actually answered. The opposite guess costs
+	# more: starting against a wall would put the camera through it, and this
+	# way the worst case is one frame too far out, which the instant pull-in
+	# corrects on the very next one.
+	var allowed := _arm.get_hit_length() if _swept else _arm.spring_length
+	_swept = true
 	_length = ArmSmoothing.recover_clamped(
 		_length, allowed, PULL_IN_RATE, PUSH_OUT_RATE, delta, MIN_LENGTH, _arm.spring_length)
 	_camera.position = Vector3(0.0, 0.0, _length)

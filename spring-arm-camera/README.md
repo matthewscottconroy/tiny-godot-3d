@@ -40,6 +40,17 @@ still puts the camera's near plane inside the wall.
 the near plane has somewhere to be. Without it the camera rests exactly on the
 surface and clips through.
 
+**The first frame's answer is not an answer.** `get_hit_length()` returns `0`
+until the arm has actually swept, and the first physics frame is before that —
+an arm alone in an empty scene reports `0` too. It means "not asked yet", not
+"blocked at zero metres", and a driver that cannot tell the difference takes the
+camera straight to its minimum and then eases it out over the following second.
+Nothing errors and nothing warns, so it reads as a deliberate zoom-out on spawn,
+and it happens on every single run. The demo assumes clear until the arm has
+answered once; the opposite guess is worse, because starting against a wall
+would put the camera through it, and this way the worst case is one frame too
+far out that the instant pull-in fixes on the next.
+
 **The character has to be excluded by hand.** The sweep starts at head height,
 right beside the collider it is supposed to be looking past, so pitch the camera
 down and the first thing it finds is the player: the arm collapses and the view
