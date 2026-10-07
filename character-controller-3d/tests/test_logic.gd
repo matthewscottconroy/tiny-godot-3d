@@ -56,6 +56,16 @@ func test_gravity_pulls_down() -> void:
 	var m := CharacterMotor.new()
 	m.step(Vector3.ZERO, false, false, false, STEP)
 	expect(m.velocity.y < 0.0, "an airborne character accelerates downward")
+	# Not just downward — by the right amount. Every per-frame quantity here is
+	# a rate multiplied by delta, and a rate *divided* by it still falls, still
+	# looks like gravity, and falls at a different speed on every machine.
+	expect(is_equal_approx(m.velocity.y, -m.gravity * STEP),
+		"by exactly gravity times this frame's own delta")
+	var halves := CharacterMotor.new()
+	halves.step(Vector3.ZERO, false, false, false, STEP * 0.5)
+	halves.step(Vector3.ZERO, false, false, false, STEP * 0.5)
+	expect(is_equal_approx(halves.velocity.y, m.velocity.y),
+		"so two half-frames of fall land exactly where one whole frame does")
 
 func test_landing_zeroes_fall() -> void:
 	print("landing")
@@ -122,6 +132,15 @@ func test_acceleration_is_gradual() -> void:
 	var after_one := m.horizontal_speed()
 	expect(after_one > 0.0, "the character starts moving immediately")
 	expect(after_one < m.walk_speed, "but does not reach full speed in one frame")
+
+	# On both axes, and by a stated amount. Driving only -Z leaves velocity.x at
+	# zero whatever the x line does to it, so a mistake there has nothing to show
+	# up in — which is exactly how one hid here.
+	var sideways := CharacterMotor.new()
+	sideways.step(Vector3.RIGHT, false, false, true, STEP)
+	expect(is_equal_approx(sideways.velocity.x, sideways.acceleration * STEP),
+		"strafing accelerates by the rate times the frame, not divided by it")
+	expect(is_zero_approx(sideways.velocity.z), "and does not drift on the other axis")
 
 func test_air_control_is_weaker() -> void:
 	print("air control")

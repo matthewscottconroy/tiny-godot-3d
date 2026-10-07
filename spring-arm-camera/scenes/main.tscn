@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 
@@ -20,6 +20,10 @@ height = 1.4
 
 [sub_resource type="SphereShape3D" id="6"]
 radius = 0.3
+
+[sub_resource type="CapsuleShape3D" id="7"]
+radius = 0.35
+height = 1.4
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1")
@@ -55,9 +59,14 @@ mesh = SubResource("3")
 [node name="Shape" type="CollisionShape3D" parent="WallSide"]
 shape = SubResource("4")
 
-[node name="Target" type="MeshInstance3D" parent="."]
+[node name="Target" type="AnimatableBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Target"]
 mesh = SubResource("5")
+
+[node name="Shape" type="CollisionShape3D" parent="Target"]
+shape = SubResource("7")
 
 [node name="Pivot" type="Node3D" parent="."]
 

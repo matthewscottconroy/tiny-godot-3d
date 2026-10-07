@@ -115,7 +115,7 @@ is the demo driver and is not needed.
 
 ## Related demos
 
-- [terrain-splatting](../terrain-splatting) — Texturing terrain by slope and height, with weights that add up and edges that do not band.
+- [triplanar-mapping](../triplanar-mapping) — Texturing a cliff without the vertical smearing a flat UV gives it, by projecting from three axes and blending on the normal.
 - [grid-map](../grid-map) — Level building with GridMap and a MeshLibrary made in code, from a room drawn as text.
 - [noise-terrain](../noise-terrain) — A heightmap from FastNoiseLite turned into a mesh, with slope-shaded regions and a seed you can change.
 - [joints-3d](../joints-3d) — A HingeJoint3D door with limits and a motor, and a PinJoint3D chain — physics constraints instead of animation.

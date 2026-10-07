@@ -207,4 +207,19 @@ func _physics_process(_delta: float) -> void:
 				"the area itself is on no layer — it detects, it is not detected")
 			var door: Node3D = _scene.get_node("Door")
 			expect(door.position.y > 1.5, "and the door the plate drives has started opening")
+			# Switch the trigger off with the body still standing on it.
+			plate.monitoring = false
+		16:
+			var plate: Area3D = _scene.get_node("Plate")
+			expect(plate.get_overlapping_bodies().is_empty(),
+				"a switched-off area reports no overlaps, even with a body inside it")
+			plate.monitoring = true
+		20:
+			# The catch-up. Turning monitoring back on does not replay the
+			# body_entered the area never sent, so anything tracking occupancy
+			# has to ask for the current state instead of waiting for an event.
+			var plate: Area3D = _scene.get_node("Plate")
+			var crate: Node3D = _scene.get_node("Crate")
+			expect(plate.get_overlapping_bodies().has(crate),
+				"switching it back on repopulates the overlap list to be asked for")
 			_report()

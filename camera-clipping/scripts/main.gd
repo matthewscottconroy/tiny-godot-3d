@@ -22,7 +22,7 @@ var _pushed := 0.0
 func _ready() -> void:
 	_hint.text = "A/D walk into the wall   1/2 near plane   3/4 field of view   G guard on or off   R reset"
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var move := Input.get_axis(&"ui_left", &"ui_right")
 	_player.velocity = Vector3(move * 3.0, 0, 0)
 	_player.move_and_slide()

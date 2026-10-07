@@ -101,6 +101,13 @@ func test_recovering_blends_rather_than_snaps() -> void:
 	# Snapping to the first frame of "stand up" is the going-limp bug in reverse.
 	expect(quarter > 0.0 and quarter < 1.0,
 		"part-way through, the animation is part-way in charge (%.2f)" % quarter)
+	# A quarter of the way through means a quarter of the way back. "Between 0
+	# and 1" is true of any curve at all, including one that hands control back
+	# almost instantly and then crawls.
+	expect(is_equal_approx(quarter, 0.25),
+		"and by exactly the fraction of the recovery that has elapsed")
+	expect(is_equal_approx(ragdoll.animation_weight(), quarter),
+		"which animation_weight() reports without advancing it again")
 	expect(ragdoll.advance_recovery(ragdoll.recovery_time * 0.25) > quarter,
 		"and further through, more so")
 

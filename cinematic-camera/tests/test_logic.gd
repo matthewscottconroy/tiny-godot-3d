@@ -97,6 +97,17 @@ func test_blending_takes_the_time_it_is_given() -> void:
 	expect(is_equal_approx(track.blend(), 1.0), "the full time arrives at the cutscene camera")
 	expect(not track.is_blending(), "and the blend is over")
 
+	# A duration that is not one second. At exactly 1.0 the step is delta either
+	# multiplied or divided by it, so a blend that scaled the wrong way would
+	# look perfect in every assertion above.
+	var slow := CameraTrack.new()
+	slow.blend_duration = 4.0
+	slow.set_cinematic(true)
+	slow.advance_blend(1.0)
+	expect(absf(slow.blend() - 0.25) < 0.001,
+		"one second of a four-second blend is a quarter of the way across")
+	expect(slow.is_blending(), "with three seconds still to go")
+
 func test_blending_back() -> void:
 	print("blending out")
 	var track := CameraTrack.new()

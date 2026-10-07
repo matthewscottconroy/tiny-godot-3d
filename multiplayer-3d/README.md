@@ -118,7 +118,7 @@ is the demo driver and is not needed.
 
 ## Related demos
 
-- [client-prediction](../client-prediction) — Moving before the server answers, and putting it right when the answer disagrees.
+- [replication-visibility](../replication-visibility) — Replicating state with MultiplayerSynchronizer instead of hand-written RPCs, and only to the peers close enough to need it.
 - [object-pool-3d](../object-pool-3d) — Recycling scene instances instead of allocating them, and the reset step that makes pooling safe.
 - [camera-framing](../camera-framing) — A camera that keeps several things on screen at once — the RTS and party-game problem, as arithmetic.
 - [skeleton-3d](../skeleton-3d) — Building a Skeleton3D in code and posing its bones — local poses, rests, and what BoneAttachment3D is for.

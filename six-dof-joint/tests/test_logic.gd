@@ -56,6 +56,11 @@ func test_a_door() -> void:
 	var swing := door.bounds("angular", DofSpec.Axis.Y)
 	expect(swing.y > swing.x, "with a range it can swing through")
 	expect(swing.x < 0.0 and swing.y > 0.0, "opening either way from shut")
+	# The shipped default, which every assertion above holds for whatever it is.
+	# A door that opens most of a full turn each way passes "it has a range" and
+	# is not a door.
+	expect(swing.y < PI, "and a door dropped in unchanged swings less than a half turn")
+	expect(swing.y > PI * 0.25, "while still opening properly")
 
 func test_a_drawer() -> void:
 	print("a drawer")
@@ -86,6 +91,11 @@ func test_a_shoulder() -> void:
 	var twist := shoulder.bounds("angular", DofSpec.Axis.Z)
 	var reach := shoulder.bounds("angular", DofSpec.Axis.X)
 	expect(twist.y < reach.y, "and it twists less than it reaches")
+	# Both are defaults on the factory, and "twists less than it reaches" stays
+	# true however far the reach goes. An arm that swings most of a full circle
+	# in every direction is not a shoulder, it is a windmill.
+	expect(reach.y < PI * 0.5, "a shoulder reaches less than a quarter turn each way")
+	expect(reach.y > 0.0 and twist.y > 0.0, "in both senses, rather than being locked")
 
 func test_the_node_you_dropped_in_unchanged() -> void:
 	print("straight out of the box")

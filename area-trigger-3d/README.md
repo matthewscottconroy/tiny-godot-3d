@@ -25,6 +25,7 @@ gives you a trigger that fires for stray debris and bullets.
 |-----|--------|
 | 1 | Drop the crate onto the plate |
 | 2 | Drop the debris onto the plate — the plate ignores it |
+| M | Switch the plate off and on — `monitoring`, and the catch-up it needs |
 | R | Put both back |
 
 Stand the crate on the plate for two seconds and the door locks open.

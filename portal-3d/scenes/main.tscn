@@ -62,6 +62,7 @@ material_override = SubResource("green")
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -10, 1.5, -6)
 
 [node name="Surface" type="MeshInstance3D" parent="PortalA"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 mesh = SubResource("portal_mesh")
 
 [node name="Frame" type="MeshInstance3D" parent="PortalA"]
@@ -79,6 +80,7 @@ render_target_update_mode = 3
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 10, 1.5, -6)
 
 [node name="Surface" type="MeshInstance3D" parent="PortalB"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 mesh = SubResource("portal_mesh")
 
 [node name="Frame" type="MeshInstance3D" parent="PortalB"]

@@ -13,6 +13,7 @@ var _frame := 0
 var _queue := LoadQueue.new()
 var _events: Array[String] = []
 var _progress_seen: Array[float] = []
+var _pending_seen: Array[int] = []
 var _stage := 0
 var _settle := 0
 var _second_batch_frame := 0
@@ -112,6 +113,7 @@ func _process(_delta: float) -> void:
 		1:
 			_queue.poll()
 			_progress_seen.append(_queue.progress())
+			_pending_seen.append(_queue.pending())
 			if _queue.is_done():
 				# Keep polling for a few more frames before checking. A queue
 				# that announces itself every frame once finished is a queue
@@ -163,6 +165,18 @@ func _check_results() -> void:
 		if _progress_seen[i] < _progress_seen[i - 1] - 0.0001:
 			monotonic = false
 	expect(monotonic, "progress never went backwards while loading")
+
+	# Progress is a fraction of the requests, so it cannot read complete while
+	# any of them are still outstanding. Scale it the wrong way and it saturates
+	# at 100% on the first byte — still monotonic, still ending at 1.0, and a
+	# bar that sits full for the entire load.
+	var complete_too_early := 0
+	for i in _progress_seen.size():
+		if _pending_seen[i] > 0 and _progress_seen[i] >= 1.0 - 0.0001:
+			complete_too_early += 1
+	expect(complete_too_early == 0,
+		"progress never reached 100%% while loads were still pending (%d frames did)"
+		% complete_too_early)
 	expect(is_equal_approx(_queue.progress(), 1.0), "and finished at exactly 100%")
 
 	var scene := _queue.get_result(PROPS[1]) as PackedScene

@@ -171,3 +171,39 @@ jobs:
           export PATH="$HOME/godot:$PATH"
           ./run-tests.sh --smoke-only >/dev/null
           ./tools/mutate.py --limit 6 --check
+
+  leaks:
+    # Serial by design — one Godot process at a time — so it is too slow to gate
+    # a push, and it shares the mutation job's schedule for that reason.
+    #
+    # Worth gating at all because run-tests.sh cannot: it allowlists the
+    # "ObjectDB instance leaked at exit" warning, since two demos provoke one
+    # inside the engine's own audio shutdown and nothing here can fix that. A
+    # leak introduced by a demo would arrive as the same warning and be waved
+    # through with them. See docs/MEMORY.md.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7.1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL "$url" -o /tmp/godot.zip
+          unzip -o /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+      - name: Check for object leaks
+        run: |
+          export PATH="$HOME/godot:$PATH"
+          ./run-tests.sh --smoke-only >/dev/null
+          ./tools/leakcheck.sh

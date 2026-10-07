@@ -32,6 +32,11 @@ func _apply() -> void:
 	var energy := 1.0 if _shafts else 0.0
 	_sun.light_volumetric_fog_energy = energy
 	_lamp.light_volumetric_fog_energy = energy * 2.0
+	# Direct light gives you shafts; this is what lets the fog pick up light that
+	# has already bounced, so an indirectly-lit room reads as lit rather than as
+	# a grey box with a beam in it. Off by default, and it needs a GI source to
+	# inject *from* — with none in the scene, raising it does nothing at all.
+	environment.volumetric_fog_gi_inject = 1.0 if _shafts else 0.0
 	_show()
 
 func _process(delta: float) -> void:

@@ -39,6 +39,12 @@ func _report() -> void:
 func _control() -> HingeControl:
 	var control := HingeControl.new()
 	control.min_angle = 0.0
+	# The shipped default first — every test below sets its own limit, so nothing
+	# otherwise checks that a door dropped in unchanged opens a sensible amount.
+	expect(HingeControl.new().max_angle < PI,
+		"a door's default limit is less than a half turn, not more")
+	expect(HingeControl.new().max_angle > PI * 0.25,
+		"and more than a crack")
 	control.max_angle = PI * 0.5
 	control.speed = 2.0
 	control.tolerance = 0.02

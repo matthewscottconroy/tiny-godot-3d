@@ -87,6 +87,8 @@ DEPRECATED = {
 WASD_EXEMPT = {}
 
 problems = []
+# Drift worth seeing that the person running this cannot fix from here.
+notes = []
 
 
 def fail(demo, message):
@@ -289,6 +291,99 @@ CROSSLINK_EXEMPT = {}
 # Below this a suite is not really checking the demo, whatever its score.
 MIN_ASSERTIONS = 6
 
+# The "Key Godot APIs" table promises "what to look up for this demo", and a
+# reader takes every row as something the code in front of them calls. Six
+# READMEs had drifted into listing an API the demo never touches — advice for an
+# adopter, formatted identically to the rows that are demonstrated, with nothing
+# to tell them apart. This is the API-table twin of check_control_claims().
+#
+# A row that is genuinely advice belongs in prose, or in the table marked with
+# the suffix below, which says so in the rendered README rather than only here.
+API_ADVISORY = "(not used here)"
+API_SECTION = re.compile(r"^## Key Godot APIs.*?(?=^## |\Z)", re.S | re.M)
+
+# docs/COMPATIBILITY.md is generated from the CI matrix — but by a job that
+# uploads it as an artifact for a maintainer to copy in, because CI does not
+# push. Every other generated file here has a --check that fails on drift; this
+# one could not, since build_compat.py needs the run's results to regenerate it.
+#
+# What *is* checkable without those results is the claim the table makes about
+# which versions were tested. That is the half that actually drifted: the matrix
+# moved to 4.7.1 and the table went on saying 4.7.
+CI_WORKFLOW = ".github/workflows/tests.yml"
+COMPAT_DOC = "docs/COMPATIBILITY.md"
+COMPAT_COUNT = re.compile(r"^_(\d+) demos across \d+ versions\._$", re.M)
+CI_MATRIX = re.compile(r"^\s*godot:\s*\[([^\]]*)\]", re.M)
+COMPAT_VERSIONS = re.compile(r"^Versions tested:\s*(.+)$", re.M)
+
+
+def _api_symbols(span):
+    """The names a `Key Godot APIs` cell is really pointing at.
+
+    A cell is written for a reader, not a parser: `Skeleton3D.get_bone_pose()`,
+    `Generic6DOFJoint3D.set_flag_x/y/z()`, `PARAM_LIMIT_*`, and shader syntax
+    like `sampler2D : hint_screen_texture`. What matters is the member — the
+    class name is almost always present in the demo anyway, so matching on that
+    would pass every row regardless.
+
+    Returns compiled patterns, because a cell may legitimately use `*` to stand
+    for a family of constants rather than name one.
+    """
+    span = re.sub(r"\(.*?\)", "", span).replace("()", "")
+    out = []
+    for token in re.split(r"[/\s:,]+", span):
+        token = token.strip().split(".")[-1]
+        if not token or not re.search(r"\w", token):
+            continue
+        out.append(re.compile("".join(r"\w*" if c == "*" else re.escape(c)
+                                      for c in token)))
+    return out
+
+
+def demo_source(demo):
+    """Every line of the demo a reader gets — including the suite.
+
+    The suite counts: it is shipped with the demo and read as part of it, and
+    several READMEs quite reasonably cite the API you would *verify* the
+    mechanism with rather than the one that drives it. `get_overlapping_bodies()`
+    is the state-query counterpart to the signals, and the suite is where asking
+    for state rather than waiting for a transition actually makes sense.
+    """
+    text = []
+    for sub, pattern in (("scripts", "*.gd"), ("scenes", "*.tscn"),
+                         ("shaders", "*.gdshader"),
+                         ("tests", "*.gd"), ("tests", "*.tscn")):
+        for path in sorted(glob.glob(os.path.join(demo, sub, pattern))):
+            text.append(read(path))
+    return "\n".join(text)
+
+
+def check_api_claims(demo):
+    """Flag a `Key Godot APIs` row the demo never actually uses.
+
+    check_control_claims() does this for the Controls section; this is the same
+    invariant one section down. A row here is read as "what this demo calls, go
+    look it up" — four READMEs had drifted into listing an API that only appears
+    in the adoption advice, formatted identically to the rows that are real.
+    """
+    text = authored(demo)
+    section = API_SECTION.search(text)
+    if not section:
+        return
+    source = demo_source(demo)
+    for line in section.group(0).split("\n"):
+        if not line.startswith("|"):
+            continue
+        cell = line.split("|")[1] if line.count("|") >= 2 else ""
+        if API_ADVISORY in line:
+            continue
+        for span in re.findall(r"`([^`]+)`", cell):
+            symbols = _api_symbols(span)
+            if symbols and not any(s.search(source) for s in symbols):
+                fail(demo, "README lists `%s` under Key Godot APIs but no script "
+                           "or scene uses it — move it into the prose, or mark "
+                           "the row %s" % (span, API_ADVISORY))
+
 
 def check_cross_links(demo):
     """Every demo should point at least one other demo."""
@@ -357,6 +452,75 @@ def check_index():
                         % (footer.group(1), len(actual)))
 
 
+# The learning paths are what make the collection more than an index: they order
+# it, and tools/build_index.py turns that order into each demo's "Related demos"
+# links. A demo on no path gets no links from its neighbours, and nobody walking
+# a route ever reaches it — four demos had quietly ended up that way.
+PATHS_DOC = "docs/LEARNING_PATHS.md"
+PATH_STEP = re.compile(r"^\| \d+ \| \[([a-z0-9-]+)\]\(\.\./([a-z0-9-]+)\)", re.M)
+
+
+def check_learning_paths():
+    """Every demo is a step on at least one learning path."""
+    if not os.path.exists(PATHS_DOC):
+        return
+    steps = PATH_STEP.findall(read(PATHS_DOC))
+    for name, link in steps:
+        if name != link:
+            problems.append("%s: step '%s' links to '%s'" % (PATHS_DOC, name, link))
+    placed = {name for name, _ in steps}
+    for demo in sorted(set(demo_dirs()) - placed):
+        problems.append("%s: '%s' is not on any learning path" % (PATHS_DOC, demo))
+    for name in sorted(placed - set(demo_dirs())):
+        problems.append("%s: a path includes '%s' but there is no such demo"
+                        % (PATHS_DOC, name))
+
+
+def check_compat_versions():
+    """The compatibility table must name the versions CI actually runs."""
+    if not (os.path.exists(CI_WORKFLOW) and os.path.exists(COMPAT_DOC)):
+        return
+    matrix = CI_MATRIX.search(read(CI_WORKFLOW))
+    claimed = COMPAT_VERSIONS.search(read(COMPAT_DOC))
+    if not matrix:
+        problems.append("%s: cannot find the Godot version matrix" % CI_WORKFLOW)
+        return
+    if not claimed:
+        problems.append("%s: no 'Versions tested:' line to check" % COMPAT_DOC)
+        return
+
+    tested = re.findall(r"[0-9]+(?:\.[0-9]+)+", matrix.group(1))
+    stated = re.findall(r"[0-9]+(?:\.[0-9]+)+", claimed.group(1))
+    if sorted(tested) != sorted(stated):
+        problems.append(
+            "%s says it covers %s but %s runs %s — regenerate it from the CI "
+            "results (tools/build_compat.py) rather than editing the numbers"
+            % (COMPAT_DOC, ", ".join(stated), CI_WORKFLOW, ", ".join(tested)))
+        return
+
+    # A demo added since the table was last copied in has never been through the
+    # matrix at all, and the badge goes on saying N/N with the newcomer outside
+    # the N. That is the other half that drifted: 58/58 next to 61 demos.
+    #
+    # A note rather than a failure: the fix is an artifact from a CI run that
+    # already includes the new demo, which the person adding it cannot produce
+    # before pushing. Failing here would only turn every new-demo PR red.
+    counted = COMPAT_COUNT.search(read(COMPAT_DOC))
+    if counted and int(counted.group(1)) != len(demo_dirs()):
+        notes.append(
+            "%s covers %s demos but there are %d — copy in the `compatibility` "
+            "artifact from a CI run that includes them" % (COMPAT_DOC, counted.group(1),
+                                                           len(demo_dirs())))
+
+    # The README badge is generated alongside the table and goes stale with it.
+    newest = tested[-1]
+    badge = re.search(r"<!-- compat-badge -->(.*?)<!-- /compat-badge -->",
+                      read("README.md"), re.S)
+    if badge and newest not in badge.group(1):
+        problems.append("README.md: the compat badge does not mention %s, the "
+                        "newest version CI runs" % newest)
+
+
 def main():
     if not os.path.exists("README.md"):
         print("run this from the repository root", file=sys.stderr)
@@ -378,10 +542,16 @@ def main():
         if os.path.exists(demo + "/README.md"):
             check_sections(demo)
             check_control_claims(demo)
+            check_api_claims(demo)
             check_stale_version_prose(demo)
             check_cross_links(demo)
             check_tags(demo)
     check_index()
+    check_learning_paths()
+    check_compat_versions()
+
+    for note in notes:
+        print("note: " + note)
 
     if problems:
         print("%d problem(s):\n" % len(problems))

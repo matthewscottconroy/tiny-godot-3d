@@ -54,6 +54,38 @@ func test_dragging_down_lifts_the_camera() -> void:
 	r.look(Vector2(0.0, -200.0))
 	expect(r.pitch < raised, "and dragging the other way brings it back down")
 
+	# The horizontal half, which has no clamp to give it away. An inverted yaw
+	# still orbits perfectly smoothly — just the wrong way — so the sign has to
+	# be stated rather than watched.
+	var h := OrbitRig.new()
+	h.look(Vector2(100.0, 0.0))
+	expect(h.yaw < 0.0, "dragging right swings the camera the other way round")
+	var swung := h.yaw
+	h.look(Vector2(-100.0, 0.0))
+	expect(is_zero_approx(h.yaw), "and dragging back the same distance undoes it")
+	expect(swung < 0.0, "the drag moved yaw at all")
+
+	# Sensitivity has to scale the delta, not divide it. A rig that divides still
+	# turns, and at the default 0.005 it turns 40,000 times too fast.
+	var slow := OrbitRig.new()
+	var fast := OrbitRig.new()
+	fast.sensitivity = slow.sensitivity * 2.0
+	slow.look(Vector2(100.0, 0.0))
+	fast.look(Vector2(100.0, 0.0))
+	expect(is_equal_approx(fast.yaw, slow.yaw * 2.0),
+		"twice the sensitivity turns exactly twice as far")
+	expect(is_equal_approx(slow.yaw, -100.0 * slow.sensitivity),
+		"and the turn is the delta scaled by it, not divided")
+
+	# Pitch takes the same scaling, and has a clamp that hides a mistake in it:
+	# divide instead of multiply and pitch simply pins to its limit, which looks
+	# exactly like a player who dragged a long way.
+	var p := OrbitRig.new()
+	var started := p.pitch
+	p.look(Vector2(0.0, 20.0))
+	expect(is_equal_approx(p.pitch, started + 20.0 * p.sensitivity),
+		"a small drag pitches by the delta times sensitivity, well short of the clamp")
+
 func _flat() -> OrbitRig:
 	var r := OrbitRig.new()
 	r.pitch = 0.0

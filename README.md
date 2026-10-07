@@ -1,17 +1,17 @@
 # Tiny Godot 3D
 
-A collection of **58 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
+A collection of **61 tiny, self-contained Godot 4 demos** — each one isolates a single 3D game-development concept in the smallest complete project that teaches it. Every demo is its own Godot project with a focused `README.md`, runnable scene, and an automated test suite.
 
-Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7 — every
+Built for **Godot 4** (Forward+), and verified on 4.5.1, 4.6.1 and 4.7.1 — every
 demo passes on all three. Every demo is **3D** — 2D lives in its own
 collection, [tiny-godot-games](https://github.com/matthewscottconroy/tiny-godot-games), which covers it in 165
 demos and shares this repository's conventions and tooling.
 
 <!-- compat-badge -->
-**Godot 4.5.1 – 4.7** — 58/58 demos passing. [Full table](docs/COMPATIBILITY.md)
+**Godot 4.5.1 – 4.7.1** — 61/61 demos passing. [Full table](docs/COMPATIBILITY.md)
 <!-- /compat-badge -->
 
-> **Status: growing.** Fifty-eight demos so far. The harness, conventions,
+> **Status: growing.** Sixty-one demos so far. The harness, conventions,
 > tooling and CI are in place, so the shape is settled — what is missing is
 > breadth. The gaps are enumerated in [docs/GAPS.md](docs/GAPS.md), and anything
 > on that list is fair game to contribute.
@@ -87,13 +87,14 @@ Other tooling:
 
 ```bash
 tools/preflight.sh        # which of these pipelines can run on this machine
-tools/check_docs.py       # README structure, control claims, index drift, unlit scenes
+tools/check_docs.py       # README structure, control and API claims, index drift, unlit scenes
 tools/new-demo.sh <name>  # scaffold a demo that is green from the start
 tools/build_tags.py       # derive each demo's concept tags from its source
 tools/build_index.py      # API cross-reference and related-demo links
 tools/mutate.py           # do the suites actually catch bugs? (docs/TEST_INTEGRITY.md)
 tools/leakcheck.sh        # demos that leak objects at shutdown (docs/MEMORY.md)
 tools/screenshots.sh      # capture one PNG per demo (needs xvfb)
+tools/check_gallery.py    # demos that captured an empty frame
 tools/build_gallery.py    # write docs/GALLERY.md from those screenshots
 tools/export_web.sh       # export demos for the browser (needs export templates)
 ```
@@ -158,6 +159,7 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [procedural-mesh](procedural-mesh) | Building geometry with `SurfaceTool`: vertices, winding order, indices, and normals. |
 | [noise-terrain](noise-terrain) | A heightmap from FastNoiseLite turned into a mesh, with slope-shaded regions and a seed you can change. |
 | [terrain-splatting](terrain-splatting) | Texturing terrain by slope and height, with weights that add up and edges that do not band. |
+| [triplanar-mapping](triplanar-mapping) | Texturing a cliff without the vertical smearing a flat UV gives it, by projecting from three axes and blending on the normal. |
 | [multimesh](multimesh) | Ten thousand instances in one draw call with MultiMeshInstance3D, and a distance cull that costs nothing. |
 
 ### 💡 Rendering & Light
@@ -196,23 +198,17 @@ script on every push — see [.github/workflows/tests.yml](.github/workflows/tes
 | [threaded-loading](threaded-loading) | Loading scenes on a background thread with a progress bar, instead of freezing the game with load(). |
 | [multiplayer-3d](multiplayer-3d) | Two peers over ENet, and the interpolation buffer that makes ten updates a second look smooth. |
 | [client-prediction](client-prediction) | Moving before the server answers, and putting it right when the answer disagrees. |
+| [replication-visibility](replication-visibility) | Replicating state with MultiplayerSynchronizer instead of hand-written RPCs, and only to the peers close enough to need it. |
+| [lag-compensation](lag-compensation) | The server rewinding the world to where a shooter actually saw it, so a hit does not depend on their ping. |
 | [accessibility-3d](accessibility-3d) | Reduced motion, subtitle scaling and colour-blind-safe cue palettes, held in one options object everything else reads. |
 
 ## What's next
 
-The 2D collection's categories suggest the shape this one should grow into, and
-[docs/TAGS.md](docs/TAGS.md) shows the same thing from the other side: the tags
-with no demos are the subjects nothing here covers yet. The gaps that matter
-most, roughly in order:
-
-- **Animation** — `AnimationTree` blend spaces and root motion, over the clips and rigs already here
-- **Level building** — CSG blockouts, level streaming, `NavigationObstacle3D`, terrain collision
-- **Rendering** — render-to-texture, volumetric fog, a shader that reads the screen
-- **Physics** — vehicles, continuous collision detection, `Generic6DOFJoint3D`
-- **Multiplayer** — authority and prediction, on top of what `multiplayer-3d` starts
-
-[docs/GAPS.md](docs/GAPS.md) is the full list, with what each demo would need to
-show.
+[docs/GAPS.md](docs/GAPS.md) is the roadmap: what is left, grouped by subject,
+ordered by how much each demo would be missed, and with what each one would need
+to show. It is kept there and only there, so that adding a demo means crossing
+off one list rather than two. Each [learning path](docs/LEARNING_PATHS.md) also
+says which of those gaps it is waiting on.
 
 ## Why a separate repository
 
@@ -229,4 +225,4 @@ than translating the 2D ones.
 
 ---
 
-*58 demos. Each teaches one thing, completely.*
+*61 demos. Each teaches one thing, completely.*

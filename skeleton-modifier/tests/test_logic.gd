@@ -191,6 +191,12 @@ func _check_it_is_a_modifier() -> void:
 		"and Godot gave it the skeleton it is parented to")
 	expect(_scene.get_node("Character/Player").is_playing(),
 		"with an animation playing, so there is a pose to run after")
+	# Which frame the modifiers run on. The demo moves its target in _process(),
+	# so idle is the matching choice; on PHYSICS the head would be aiming at
+	# where the target was last physics tick, which reads as lag.
+	expect(_skeleton().modifier_callback_mode_process
+			== Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_IDLE,
+		"and the skeleton runs its modifiers on the frame the target moves on")
 
 ## What the modifier actually promises, checked from inside its own pass.
 ##

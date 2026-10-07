@@ -183,6 +183,11 @@ func _process(_delta: float) -> void:
 			for node in view.get_children():
 				if node is Camera3D and (node as Camera3D).current:
 					cameras += 1
+					# matched_fov() treats fov as the vertical angle. That is
+					# only true under KEEP_HEIGHT, so the correction and the
+					# camera have to agree about which axis they mean.
+					expect((node as Camera3D).keep_aspect == Camera3D.KEEP_HEIGHT,
+						"the pane's fov is the vertical angle matched_fov() assumes")
 	expect(shared == 2, "and pointed every one of them at the same World3D")
 	expect(cameras == 2, "each with a current camera of its own")
 

@@ -99,15 +99,29 @@ func test_offsets_stay_within_their_limits() -> void:
 	shake.decay = 0.0                      # hold it at full trauma
 	shake.add(1.0)
 	var worst := 0.0
+	var worst_depth := 0.0
 	var worst_roll := 0.0
+	var worst_pitch_yaw := 0.0
 	for i in 600:
 		shake.advance(STEP)
 		var offset := shake.offset()
 		worst = maxf(worst, maxf(absf(offset.x), absf(offset.y)))
-		worst_roll = maxf(worst_roll, absf(shake.rotation_offset().z))
+		worst_depth = maxf(worst_depth, absf(offset.z))
+		var rotation := shake.rotation_offset()
+		worst_roll = maxf(worst_roll, absf(rotation.z))
+		worst_pitch_yaw = maxf(worst_pitch_yaw, maxf(absf(rotation.x), absf(rotation.y)))
 	expect(worst <= shake.max_offset + 0.0001, "the camera never moves further than max_offset")
 	expect(worst_roll <= shake.max_roll + 0.0001, "nor rolls further than max_roll")
 	expect(worst > shake.max_offset * 0.3, "while using a decent part of the range")
+	# Every axis, not the two that happen to be checked. Each is a separate line
+	# in the component, and an unbounded one is a camera that lurches on an axis
+	# nobody thought to look at — depth especially, which reads as a zoom.
+	expect(worst_depth <= shake.max_offset * 0.5 + 0.0001,
+		"depth is deliberately shaken half as far as the other two")
+	expect(worst_depth > shake.max_offset * 0.15, "but is still shaken")
+	expect(worst_pitch_yaw <= shake.max_roll + 0.0001,
+		"and pitch and yaw are bounded by max_roll, the same as roll")
+	expect(worst_pitch_yaw > shake.max_roll * 0.3, "while using a decent part of it")
 
 func test_rotation_shakes_too() -> void:
 	print("rotation")

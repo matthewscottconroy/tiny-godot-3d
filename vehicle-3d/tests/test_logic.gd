@@ -101,6 +101,12 @@ func test_braking_and_throttle_are_exclusive() -> void:
 	print("brake or throttle")
 	var drive := Drivetrain.new()
 	expect(drive.brake_for(-1.0, 8.0) > 0.0, "braking asks for brake force")
+	# How much, not just some. A brake that scales the wrong way still stops the
+	# car — eventually, and never when you need it to.
+	expect(is_equal_approx(drive.brake_for(-1.0, 8.0), drive.max_brake),
+		"a fully held brake asks for the full brake force")
+	expect(is_equal_approx(drive.brake_for(-0.5, 8.0), drive.max_brake * 0.5),
+		"and half a pedal asks for half of it")
 	expect(is_zero_approx(drive.throttle_for(-1.0, 8.0)),
 		"and no throttle at the same time, because a car that does both has no brakes")
 	expect(is_zero_approx(drive.brake_for(-1.0, 0.0)), "reversing is not braking")

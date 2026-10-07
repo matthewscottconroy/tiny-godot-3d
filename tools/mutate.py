@@ -20,7 +20,10 @@ the suite depends on the mutated behaviour.
 A score of 0% killed means the suite is testing a copy of the logic rather than
 the logic. 100% means every change it tried was noticed.
 
-Scripts are restored after every run, including on Ctrl-C.
+Scripts are restored after every run, including on Ctrl-C. A run that is
+killed outright leaves a journal behind, which the next run restores from
+before doing anything else — or `tools/mutate.py --restore` does only that.
+run-tests.sh refuses to start while the journal exists.
 """
 
 import argparse
@@ -148,6 +151,18 @@ MUTATIONS = [
     ("literal", re.compile(r"\bfalse\b"), "true"),
     ("arithmetic", re.compile(r"(?<=[\w\)\]]) \+ (?=[\w\(])"), " - "),
     ("arithmetic", re.compile(r"(?<=[\w\)\]]) - (?=[\w\(])"), " + "),
+    # Scaling, which the four above cannot reach. In 3D this is most of the
+    # arithmetic there is — a speed, a sensitivity, a delta, a normalisation —
+    # and swapping the two is a behaviour change essentially every time, so it
+    # asks a real question of a suite without manufacturing equivalent mutants
+    # the way rewriting a numeric constant would.
+    ("arithmetic", re.compile(r"(?<=[\w\)\]]) \* (?=[\w\(])"), " / "),
+    ("arithmetic", re.compile(r"(?<=[\w\)\]]) / (?=[\w\(])"), " * "),
+    # Accumulation. `_yaw -= x` and `position += step` are the shape most of the
+    # per-frame state in these demos is written in, and none of the patterns
+    # above match a compound assignment.
+    ("assignment", re.compile(r"(?<![+\-*/])\+=(?!=)"), "-="),
+    ("assignment", re.compile(r"(?<![+\-*/])-=(?!=)"), "+="),
 ]
 
 # Lines we must not touch: comments, annotations, class/extends declarations,
@@ -406,6 +421,10 @@ def main():
                         help="fail if the score dropped below the recorded baseline")
     parser.add_argument("--update", action="store_true",
                         help="record the current score as the new baseline")
+    parser.add_argument("--force", action="store_true",
+                        help="with --update, allow recording a LOWER baseline")
+    parser.add_argument("--restore", action="store_true",
+                        help="only undo what an interrupted run left behind, then exit")
     args = parser.parse_args()
 
     demos = args.demos or sorted(os.path.dirname(p) for p in glob.glob("*/project.godot"))
@@ -418,6 +437,10 @@ def main():
               file=sys.stderr)
         for path in stranded:
             print("  " + path, file=sys.stderr)
+    if args.restore:
+        if not stranded:
+            print("nothing to restore")
+        return 0
 
     if not preflight():
         return 3
@@ -480,6 +503,27 @@ def main():
         print("run was aborted early — baseline untouched", file=sys.stderr)
         return 4
     if args.update:
+        # The baseline is a floor, and its own note says never to lower it — but
+        # --update would happily do exactly that, which is how a ratchet stops
+        # being one. It is an easy mistake to make honestly: the sample is drawn
+        # at random, so adding a single demo shifts the RNG stream and draws
+        # mutants the previous sample never hit. That is what happened at 60
+        # projects: three survivors appeared in suites nobody had touched, and
+        # an unguarded --update wrote 99.2% over a 100% floor.
+        #
+        # Those three were real gaps worth fixing. The point is that recording
+        # them as the new normal has to be a decision rather than a side effect.
+        if not args.force and os.path.exists(BASELINE):
+            with open(BASELINE, encoding="utf-8") as handle:
+                previous = float(json.load(handle).get("ratio", 0.0))
+            current = total_killed / tried if tried else 0.0
+            if current < previous:
+                print("refusing to lower the baseline from %.1f%% to %.1f%%."
+                      % (100 * previous, 100 * current), file=sys.stderr)
+                print("      Run with --verbose to see what survived and fix it,"
+                      " or --update --force if the drop is genuinely intended.",
+                      file=sys.stderr)
+                return 1
         _write_baseline(total_killed, tried, len(demos))
         return 0
     if args.check:

@@ -137,6 +137,17 @@ func test_nothing_claimed_this_point() -> void:
 	expect(is_equal_approx(empty.g, 1.0), "a point nothing claimed falls back to grass")
 	expect(is_equal_approx(empty.r + empty.g + empty.b + empty.a, 1.0), "and still adds up to one")
 
+	# The ordinary case, which the fallback above says nothing about. Weights
+	# that do not sum to one are the bug this function exists to prevent, and
+	# every channel has to be divided by the total rather than only some of them.
+	var mixed := Splat.normalise(Color(1.0, 3.0, 2.0, 2.0))
+	expect(is_equal_approx(mixed.r + mixed.g + mixed.b + mixed.a, 1.0),
+		"ordinary weights are scaled to add up to one")
+	expect(is_equal_approx(mixed.r, 0.125) and is_equal_approx(mixed.g, 0.375),
+		"each channel keeping its share of the total")
+	expect(is_equal_approx(mixed.b, 0.25) and is_equal_approx(mixed.a, 0.25),
+		"including the last one, which is written on its own line")
+
 func test_the_dominant_material() -> void:
 	print("one answer")
 	# For a footstep sound or a particle effect: the things that need one answer

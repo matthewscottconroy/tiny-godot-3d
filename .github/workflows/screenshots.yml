@@ -9,14 +9,23 @@ name: screenshots
 # refreshing when a demo's visuals actually change.
 #
 # A 3D still is a weaker artefact than a 2D one — it flattens the thing it is
-# meant to show — so MOTION=1 and the short WebP loops matter more here. That
-# needs ffmpeg, which the runner already has.
+# meant to show — so the short WebP loops are worth more here than they are in
+# 2D. They are opt-in rather than the default, and the reason is the weekly
+# commit below: a loop is roughly ten times the bytes of a still and takes
+# several times as long to capture, so refreshing all of them every week would
+# add a fresh ~19MB of binaries to the history each time, for ever. Ask for them
+# with the `motion` input on a manual run, when the visuals have actually
+# changed enough to be worth it. Needs ffmpeg, which the runner already has.
 
 on:
   workflow_dispatch:
     inputs:
       commit:
         description: "Commit the refreshed screenshots back to the branch"
+        type: boolean
+        default: false
+      motion:
+        description: "Also capture short WebP loops (much slower, ~10x the bytes)"
         type: boolean
         default: false
   schedule:
@@ -57,9 +66,18 @@ jobs:
           ./run-tests.sh --smoke-only
 
       - name: Capture screenshots
+        env:
+          MOTION: ${{ inputs.motion && '1' || '0' }}
         run: |
           export PATH="$HOME/godot:$PATH"
           ./tools/screenshots.sh
+
+      - name: Check no demo rendered an empty frame
+        # The pixels, not the scene file. check_docs.py already refuses a scene
+        # with no light in it; this catches the ones that are lit and still show
+        # nothing — a camera too far away, a mesh with no surface. It runs here
+        # rather than in the push job because it needs a capture to look at.
+        run: ./tools/check_gallery.py
 
       - name: Build the gallery
         run: ./tools/build_gallery.py

@@ -118,7 +118,7 @@ demo driver and is not needed.
 ## Related demos
 
 - [screen-shader](../screen-shader) — A shader that reads the screen behind it — refraction, fresnel, and the thing it cannot see.
-- [animation-in-code](../animation-in-code) — Building an Animation and an AnimationPlayer at runtime — a walk cycle with no animation data on disk.
+- [tween-3d](../tween-3d) — Tween or AnimationPlayer — what each is for, and the two tweens that end up fighting over one property.
 - [camera-framing](../camera-framing) — A camera that keeps several things on screen at once — the RTS and party-game problem, as arithmetic.
 - [level-streaming](../level-streaming) — Loading and freeing chunks around a moving player, with the keep-radius that stops them thrashing at a boundary.
 

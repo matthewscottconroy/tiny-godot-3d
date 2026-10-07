@@ -172,7 +172,11 @@ func _process(_delta: float) -> void:
 			"and stands on the curve rather than half-buried in it")
 
 	# Rails are spread up the post: the lowest at 35% of its height and the
-	# highest at 85%, whatever the rail count.
+	# highest at 85%, whatever the rail count — so ask for a count that is not
+	# the default. At two rails the fraction that spaces them is a division by
+	# one, and a spacing that scales the wrong way lands in exactly the right
+	# place. At three it climbs straight past the top of the post.
+	builder.rails = 3
 	var heights: Array[float] = []
 	for child in builder.get_children():
 		if child.is_in_group(&"fence_rail"):
@@ -184,6 +188,8 @@ func _process(_delta: float) -> void:
 			"the lowest rail is a third of the way up the post")
 		expect(absf(heights[heights.size() - 1] - builder.post_height * 0.85) < 0.05,
 			"and the highest is near the top of it")
+		expect(absf(heights[heights.size() / 2] - builder.post_height * 0.6) < 0.05,
+			"with the third one spaced evenly between them")
 
 	# A builder with no Path3D at all: the case that only happens the moment
 	# someone drops the node into a scene, which is also the moment a @tool

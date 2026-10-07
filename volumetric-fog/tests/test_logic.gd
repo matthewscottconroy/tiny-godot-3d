@@ -100,6 +100,14 @@ func test_ground_mist() -> void:
 	expect(overhead > 0.0, "but not nothing, because a hard edge to fog looks like a bug")
 	expect(Volumetrics.height_density(0.1, -5.0) == at_ground,
 		"and below the floor it does not keep thickening")
+	# What `falloff` actually means: the height over which the density drops to
+	# about a third. Ordering assertions are satisfied by any curve that goes
+	# down — including one that falls off a cliff a metre up — so the constant
+	# has to be stated rather than compared against itself.
+	expect(absf(Volumetrics.height_density(0.1, 6.0) - 0.1 * exp(-1.0)) < 0.0001,
+		"one falloff height up, the density is base/e")
+	expect(absf(Volumetrics.height_density(0.1, 12.0) - 0.1 * exp(-2.0)) < 0.0001,
+		"and two falloff heights up, base/e squared")
 
 func test_mist_that_sits_somewhere_other_than_zero() -> void:
 	print("mist in a valley")
@@ -165,6 +173,7 @@ func _process(_delta: float) -> void:
 			# with its shafts off would look identical afterwards.
 			_check_the_environment()
 			_check_the_controls()
+			_check_the_lamp_drifts()
 			_report()
 
 func _key(code: Key, pressed: bool = true, echo: bool = false) -> InputEventKey:
@@ -211,6 +220,39 @@ func _check_the_controls() -> void:
 	_scene.call("_unhandled_key_input", _key(KEY_2, false))
 	expect(is_equal_approx(_scene.get("_density"), density), "and neither does letting go")
 
+## The lamp crosses the fog so you can watch light enter it from the side.
+##
+## Its rate is the one number here that only exists to be looked at, which is
+## exactly why nothing was checking it: every assertion about the fog itself
+## holds whether the lamp takes fifteen seconds to cross or half a second.
+func _check_the_lamp_drifts() -> void:
+	print("the lamp")
+	var lamp: OmniLight3D = _scene.get_node("Lamp")
+	_scene.set("_time", 0.0)
+	_scene.call("_process", 0.0)
+	expect(is_zero_approx(lamp.position.x), "the lamp starts at the middle of its sweep")
+
+	# A quarter period at 0.4 rad/s is PI / 0.8 seconds, where it should be at
+	# the far end of the sweep. Six times that rate would already be back.
+	_scene.call("_process", PI / 0.8)
+	expect(absf(lamp.position.x - 5.0) < 0.01,
+		"and a quarter of its period later it is at the end of it (%.2f)" % lamp.position.x)
+
+	# within_volume() answers a fraction and the readout states a percentage.
+	# Printing the fraction where the percentage belongs turns "68% of the
+	# volume" into "0%", which is a different claim about whether the fog
+	# reaches the thing you are looking at.
+	var readout: Label = _scene.get_node("HUD/ReadoutLabel")
+	var camera: Camera3D = _scene.get_node("Camera3D")
+	var furthest := 0.0
+	for pillar in _scene.get_node("Pillars").get_children():
+		furthest = maxf(furthest,
+			camera.global_position.distance_to((pillar as Node3D).global_position))
+	var share := Volumetrics.within_volume(furthest, _scene.get("_length"))
+	expect(share > 0.02, "the furthest pillar is a real fraction of the fog volume")
+	expect(readout.text.contains("%.0f%%" % (share * 100.0)),
+		"and the readout states that fraction as a percentage")
+
 func _check_the_environment() -> void:
 	var world: WorldEnvironment = _scene.get_node("WorldEnvironment")
 	var environment := world.environment
@@ -224,6 +266,17 @@ func _check_the_environment() -> void:
 	var lamp: OmniLight3D = _scene.get_node("Lamp")
 	expect(sun.light_volumetric_fog_energy > 0.0, "the sun contributes to the fog volume")
 	expect(lamp.light_volumetric_fog_energy > 0.0, "and so does the lamp")
+	# And by the amount the demo intends. The lamp is deliberately the brighter
+	# of the two in fog — it is the one you walk up to — and "greater than zero"
+	# is just as true of a lamp half the sun's strength.
+	expect(is_equal_approx(lamp.light_volumetric_fog_energy,
+			sun.light_volumetric_fog_energy * 2.0),
+		"the lamp is twice the sun's contribution, not a fraction of it")
+
+	# Direct light is only half of it: gi_inject is what lets already-bounced
+	# light reach the fog, and it is off unless something sets it.
+	expect(environment.volumetric_fog_gi_inject > 0.0,
+		"and bounced light is injected into the fog volume too")
 
 	# And turning the shafts off has to actually reach the lights, not just the
 	# readout.
@@ -231,6 +284,8 @@ func _check_the_environment() -> void:
 	_scene.call("_apply")
 	expect(is_zero_approx(_scene.get_node("Sun").light_volumetric_fog_energy),
 		"turning shafts off takes the light out of the fog")
+	expect(is_zero_approx(environment.volumetric_fog_gi_inject),
+		"and takes the bounced light out with it")
 
 	var method := str(ProjectSettings.get_setting("rendering/renderer/rendering_method", ""))
 	expect(Volumetrics.supported(method),

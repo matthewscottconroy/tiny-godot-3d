@@ -7,9 +7,10 @@ review.
 
 ## The shape of a demo
 
-**One demo teaches one thing, completely.** The average demo is about 100 lines
-of GDScript. If yours needs three files and a diagram to follow, it is probably
-two demos.
+**One demo teaches one thing, completely.** The median demo is about 200 lines
+of GDScript across `scripts/`, and `tools/check_docs.py` fails one over 250
+unless it carries a `# size-exempt: <reason>`. Five demos do. If yours needs
+three files and a diagram to follow, it is probably two demos.
 
 **Readability beats reusability.** If turning the mechanism into a generic
 component would make the file harder to read as a lesson, don't. Package it
@@ -37,8 +38,16 @@ README with the six required sections. It passes `./run-tests.sh` and
 from broken.
 
 Then add a row to the index in the root `README.md` under the right category,
-and bump the two demo counts (the intro and the footer). `tools/check_docs.py`
-will tell you if you forget.
+bump the two demo counts (the intro and the footer), and add the demo as a step
+on whichever [learning path](docs/LEARNING_PATHS.md) it extends — that is where
+its "Related demos" links come from. `tools/check_docs.py` will tell you if you
+forget either.
+
+Run `tools/build_index.py` until `--check` is clean, rather than once. Adding a
+demo changes which demos are neighbours of which, so the first pass can leave a
+README it had already written pointing at the old set — a second pass settles
+it. Observed adding the sixty-second demo, where one run left
+`character-controller-3d` stale and CI would have failed on it.
 
 ## Tests
 
@@ -82,10 +91,12 @@ measures and how to read a report.
 | Check | What it catches |
 |-------|-----------------|
 | `./run-tests.sh` | Demos that fail to load, failing assertions, engine warnings, and suites that abort partway |
-| `tools/check_docs.py` | Missing README sections, controls the code never binds, index drift, demo-count drift, demos that link to nothing, suites too thin to be checking much, scenes with no light in them |
+| `tools/check_docs.py` | Missing README sections, controls the code never binds, APIs the Key Godot APIs table names but no file uses, index drift, demo-count drift, demos on no learning path, a compatibility table that has fallen behind the CI matrix, demos that link to nothing, suites too thin to be checking much, scenes with no light in them |
 | `tools/build_index.py --check` | A stale API index or stale related-demo links |
 | `tools/build_tags.py --check` | Concept tags that no longer match the source they are derived from |
 | `tools/mutate.py --check` | A test suite that got weaker (weekly, not per-push) |
+| `tools/leakcheck.sh` | A demo that leaks objects at shutdown (weekly; run-tests.sh allowlists the warning) |
+| `tools/check_gallery.py` | A demo whose captured frame is empty — lit, and still showing nothing (with the screenshots job) |
 | `gdlint` | Dead arguments, mixed tabs/spaces, tautological comparisons, naming |
 
 `tools/preflight.sh` reports which of the repository's pipelines can run on your
@@ -160,7 +171,12 @@ All six are required, and `tools/check_docs.py` enforces their presence:
 - **Purpose** — why this matters in a real game. Not a restatement of the title.
 - **Controls** — every input. Say "none" if the demo is passive.
 - **How It Works** — the mechanism, in the order it happens.
-- **Key Godot APIs** — a table of what to look up in the docs.
+- **Key Godot APIs** — a table of what to look up in the docs. Every row must
+  name something the demo's own scripts, scenes, shaders or suite actually use;
+  `check_docs.py` fails a row that does not. Advice an adopter needs but the
+  demo does not show belongs in the prose, or in a row marked
+  `(not used here)`. Six READMEs had drifted into listing an API nothing
+  called, formatted identically to the rows that were real.
 - **Files** — what each file holds.
 - **Use as a building block** — what to copy, the public API, and any autoloads,
   input actions, or project settings an adopter needs.
@@ -176,5 +192,13 @@ All six are required, and `tools/check_docs.py` enforces their presence:
   cannot check anything at all.
 - Type the things that matter. `var x := 5` is fine; `var x := some_dictionary[k]`
   will not compile, because Godot refuses to infer from a Variant.
+- A hand-written `Transform3D` in a `.tscn` is stored **row-major**, while
+  `basis.x` / `basis.y` / `basis.z` in GDScript are the **columns**. Writing the
+  three basis vectors into the file in the order you get them gives you the
+  transpose — which is a valid rotation, so nothing errors and the camera simply
+  faces somewhere else. `Transform3D(1, 2, 3, 4, 5, 6, 7, 8, 9, ...)` loads back
+  as `basis.x == (1, 4, 7)`. Easiest to avoid entirely: place cameras with
+  `look_at()` in `_ready()`, which is also self-documenting about what they are
+  meant to be pointed at.
 - Comments explain *why*, not *what*. The code already says what.
 - Prefer showing the mechanism over hiding it behind a helper.

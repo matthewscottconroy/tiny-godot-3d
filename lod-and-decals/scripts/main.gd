@@ -72,7 +72,13 @@ func _apply_ranges() -> void:
 func _process(delta: float) -> void:
 	if _moving:
 		_time += delta
-		_distance = 10.0 + (sin(_time * 0.3) * 0.5 + 0.5) * 60.0
+		# Starts at the near end and pulls away, rather than starting mid-sweep.
+		# A sine starts halfway out and heads further, so the first fifteen
+		# seconds of a demo about losing detail with distance are spent watching
+		# props too small to have any — you see the readout change without ever
+		# having seen what it costs. 1 - cos begins at zero, so the props are
+		# close enough to read before they start receding.
+		_distance = 10.0 + (1.0 - cos(_time * 0.3)) * 0.5 * 60.0
 	_camera.position = Vector3(0, 2.5, _distance)
 
 	# The same bands, used for something the engine does not do: how often each
