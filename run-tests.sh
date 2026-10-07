@@ -160,6 +160,16 @@ if ! command -v "$GODOT" >/dev/null 2>&1; then
   exit 127
 fi
 
+# tools/mutate.py journals the pristine copy of a file before mutating it, and
+# only it restores from that journal. A run that was killed leaves the mutation
+# on disk, and testing it here would report a broken demo as the demo's own bug.
+if [ -f .mutate-journal.json ]; then
+  echo "error: .mutate-journal.json exists — a mutation run is in progress, or" >&2
+  echo "       one was interrupted and left a demo mutated. If none is running:" >&2
+  echo "         tools/mutate.py --restore" >&2
+  exit 3
+fi
+
 RUN_SMOKE=1
 RUN_LOGIC=1
 FORCE_IMPORT=0

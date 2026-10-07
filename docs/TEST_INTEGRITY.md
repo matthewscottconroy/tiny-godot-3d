@@ -33,7 +33,13 @@ every time.
 tools/mutate.py                      # every demo
 tools/mutate.py orbit-camera --verbose   # one demo, listing what survived
 tools/mutate.py --json report.json   # machine-readable
+tools/mutate.py --restore            # undo a run that was killed, and nothing else
 ```
+
+A run that is killed outright cannot restore what it mutated. Every mutation is
+journalled to `.mutate-journal.json` first, the next run restores from it, and
+`run-tests.sh` refuses to start while it exists — so a leftover mutation is a
+loud failure rather than a demo that quietly fails its own suite.
 
 `scripts/main.gd` is excluded by default: it is the demo driver — scene wiring,
 HUD, input plumbing — and is not unit-tested by design. `--include-driver`

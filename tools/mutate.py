@@ -20,7 +20,10 @@ the suite depends on the mutated behaviour.
 A score of 0% killed means the suite is testing a copy of the logic rather than
 the logic. 100% means every change it tried was noticed.
 
-Scripts are restored after every run, including on Ctrl-C.
+Scripts are restored after every run, including on Ctrl-C. A run that is
+killed outright leaves a journal behind, which the next run restores from
+before doing anything else — or `tools/mutate.py --restore` does only that.
+run-tests.sh refuses to start while the journal exists.
 """
 
 import argparse
@@ -420,6 +423,8 @@ def main():
                         help="record the current score as the new baseline")
     parser.add_argument("--force", action="store_true",
                         help="with --update, allow recording a LOWER baseline")
+    parser.add_argument("--restore", action="store_true",
+                        help="only undo what an interrupted run left behind, then exit")
     args = parser.parse_args()
 
     demos = args.demos or sorted(os.path.dirname(p) for p in glob.glob("*/project.godot"))
@@ -432,6 +437,10 @@ def main():
               file=sys.stderr)
         for path in stranded:
             print("  " + path, file=sys.stderr)
+    if args.restore:
+        if not stranded:
+            print("nothing to restore")
+        return 0
 
     if not preflight():
         return 3
