@@ -14,10 +14,10 @@ Nothing differs across `4.5.1`, `4.6.1`, `4.7.1`.
 
 | Version | Passing | Failing |
 |---------|---------|---------|
-| `4.5.1` | 58 | 0 |
-| `4.6.1` | 58 | 0 |
-| `4.7.1` | 58 | 0 |
+| `4.5.1` | 61 | 0 |
+| `4.6.1` | 61 | 0 |
+| `4.7.1` | 61 | 0 |
 
 ---
 
-_58 demos across 3 versions._
+_61 demos across 3 versions._

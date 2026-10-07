@@ -51,7 +51,6 @@ example.
 
 ## Systems
 
-- **`MultiplayerSynchronizer`** — the built-in version of the same job
 - **Screen readers** — the half of accessibility that
   [menu-navigation](../menu-navigation) does not cover: telling the player what
   is focused rather than only showing them

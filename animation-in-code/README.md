@@ -116,7 +116,7 @@ is the demo driver and is not needed.
 ## Related demos
 
 - [animation-tree](../animation-tree) — An AnimationTree blend space driven by speed, built in code — and the deadzone that stops a standing character twitching.
-- [lod-and-decals](../lod-and-decals) — Distance bands that drive mesh LOD, decal fade and update rates — with the hysteresis that stops them flickering.
+- [tween-3d](../tween-3d) — Tween or AnimationPlayer — what each is for, and the two tweens that end up fighting over one property.
 - [root-motion](../root-motion) — Motion that comes from the animation rather than the code, and the sliding feet it fixes.
 - [skeleton-modifier](../skeleton-modifier) — The supported place to change a pose after the animation has set it — and why _process() is not it.
 

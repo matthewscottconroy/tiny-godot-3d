@@ -39,8 +39,7 @@ single "forward" any more, so movement and camera stop being separable problems.
 | 6 | [shape-cast-3d](../shape-cast-3d) | 🔴 | Why the character stops dead at a kerb, and the two casts that tell a step from a wall |
 | 7 | [character-push](../character-push) | 🟡 | Making the world notice: shoving what you walk into, with mass that means something |
 
-**Missing from this path:** root motion, and a character that can be pushed
-*back*.
+**Missing from this path:** a character that can be pushed *back*.
 
 ---
 
@@ -52,16 +51,16 @@ single "forward" any more, so movement and camera stop being separable problems.
 | 2 | [procedural-mesh](../procedural-mesh) | 🔴 | Geometry in code with `SurfaceTool`: vertices, winding order, shared indices, and why normals have to be derived rather than assumed |
 | 3 | [noise-terrain](../noise-terrain) | 🔴 | The same machinery driven by `FastNoiseLite`, with one height function the mesh and everything standing on it both use |
 | 4 | [terrain-splatting](../terrain-splatting) | 🔴 | Deciding what it is made of, from its own slope and height |
-| 5 | [terrain-collision](../terrain-collision) | 🔴 | Standing on it: a `HeightMapShape3D` from the same heights, and the scale that makes it line up |
-| 6 | [grid-map](../grid-map) | 🟡 | The other way to build a level: a `MeshLibrary` made in code, and rooms drawn as text |
-| 7 | [multimesh](../multimesh) | 🟡 | Filling it with scenery — thousands of instances in one draw call, and a cull that costs one integer |
-| 8 | [navigation-3d](../navigation-3d) | 🔴 | Getting something to walk across what you built, and the three ways a path silently comes back empty |
-| 9 | [navigation-obstacle](../navigation-obstacle) | 🔴 | The door in the corridor, and why dropping an obstacle on it changes no path at all |
-| 10 | [save-load-3d](../save-load-3d) | 🟡 | Persisting what the player did to it, and surviving the level being edited underneath the save |
-| 11 | [editor-tool-3d](../editor-tool-3d) | 🔴 | Building levels *in the editor*, with a `@tool` script that cannot corrupt the scene |
+| 5 | [triplanar-mapping](../triplanar-mapping) | 🔴 | Texturing the cliffs, which a flat UV smears, by projecting from three axes and blending on the normal |
+| 6 | [terrain-collision](../terrain-collision) | 🔴 | Standing on it: a `HeightMapShape3D` from the same heights, and the scale that makes it line up |
+| 7 | [grid-map](../grid-map) | 🟡 | The other way to build a level: a `MeshLibrary` made in code, and rooms drawn as text |
+| 8 | [multimesh](../multimesh) | 🟡 | Filling it with scenery — thousands of instances in one draw call, and a cull that costs one integer |
+| 9 | [navigation-3d](../navigation-3d) | 🔴 | Getting something to walk across what you built, and the three ways a path silently comes back empty |
+| 10 | [navigation-obstacle](../navigation-obstacle) | 🔴 | The door in the corridor, and why dropping an obstacle on it changes no path at all |
+| 11 | [save-load-3d](../save-load-3d) | 🟡 | Persisting what the player did to it, and surviving the level being edited underneath the save |
+| 12 | [editor-tool-3d](../editor-tool-3d) | 🔴 | Building levels *in the editor*, with a `@tool` script that cannot corrupt the scene |
 
-**Missing from this path:** CSG blockouts, terrain collision, and level
-streaming.
+**Missing from this path:** nothing on the [gap list](GAPS.md) yet.
 
 ---
 
@@ -82,8 +81,8 @@ streaming.
 | 11 | [ragdoll-3d](../ragdoll-3d) | 🔴 | Handing a character over to the physics, and taking it back |
 | 12 | [object-pool-3d](../object-pool-3d) | 🟡 | Doing all of it repeatedly without the periodic stutter that allocation brings |
 
-**Missing from this path:** `Generic6DOFJoint3D`, and continuous collision for
-a character rather than a projectile.
+**Missing from this path:** continuous collision for a character rather than a
+projectile, and an active ragdoll that stays partly animated.
 
 ---
 
@@ -102,21 +101,22 @@ like nothing at all.
 | 5 | [transparency-3d](../transparency-3d) | 🔴 | Why the glass draws in the wrong order, and the three ways out |
 | 6 | [screen-shader](../screen-shader) | 🔴 | Reading the frame behind a surface, and the one thing that trick cannot do |
 | 7 | [lod-and-decals](../lod-and-decals) | 🟡 | Keeping all of it affordable, with bands that do not flicker |
-| 8 | [animation-in-code](../animation-in-code) | 🔴 | Motion with no animation data at all: tracks, keys, and the phase offsets that make a walk a walk |
-| 9 | [animation-tree](../animation-tree) | 🔴 | Choosing between those clips at runtime: a blend space driven by speed, built in code |
-| 10 | [root-motion](../root-motion) | 🔴 | Letting the clip decide where the character goes, and the sliding feet that fixes |
-| 11 | [skeleton-3d](../skeleton-3d) | 🔴 | What an imported rig actually is: bones, rests, and poses local to a parent |
-| 12 | [two-bone-ik](../two-bone-ik) | 🔴 | The other kind of motion
-| 13 | [skeleton-modifier](../skeleton-modifier) | 🔴 | And the supported place to put either of them, so the animation does not undo it |: a foot that has to be *there*, and a knee that follows |
+| 8 | [tween-3d](../tween-3d) | 🟡 | Making things move at all: what a tween is for, what an `AnimationPlayer` is for, and two tweens fighting over one property |
+| 9 | [animation-in-code](../animation-in-code) | 🔴 | Motion with no animation data at all: tracks, keys, and the phase offsets that make a walk a walk |
+| 10 | [animation-tree](../animation-tree) | 🔴 | Choosing between those clips at runtime: a blend space driven by speed, built in code |
+| 11 | [root-motion](../root-motion) | 🔴 | Letting the clip decide where the character goes, and the sliding feet that fixes |
+| 12 | [skeleton-3d](../skeleton-3d) | 🔴 | What an imported rig actually is: bones, rests, and poses local to a parent |
+| 13 | [two-bone-ik](../two-bone-ik) | 🔴 | The other kind of motion: a foot that has to be *there*, and a knee that follows |
+| 14 | [skeleton-modifier](../skeleton-modifier) | 🔴 | And the supported place to put either of them, so the animation does not undo it |
 
-**Missing from this path:** materials and transparency sorting, decals, LOD, and
-an `AnimationTree` to blend the clips step 4 builds.
+**Missing from this path:** baked lighting with `LightmapGI`, two skeleton
+modifiers stacked on one rig, and root motion that turns as well as steps.
 
 ---
 
 ## 5. Point the camera
 
-Four demos about the thing the player is actually looking through. Each one
+Nine demos about the thing the player is actually looking through. Each one
 takes over the camera's transform, which is why the order matters: by the end
 you have three systems that all want to move it, and a shape that lets them.
 
@@ -132,9 +132,8 @@ you have three systems that all want to move it, and a shape that lets them.
 | 8 | [portal-3d](../portal-3d) | 🔴 | A second camera whose transform comes from the player's, through a pair of doorways |
 | 9 | [split-screen-3d](../split-screen-3d) | 🔴 | Or giving up and drawing two views, with the shared World3D that makes the second one show anything |
 
-**Missing from this path:** baked lighting, and volumetric fog.
-
----
+**Missing from this path:** portals that can see each other, and camera shake
+that respects the walls the camera is keeping clear of.
 
 ---
 
@@ -155,9 +154,13 @@ it stutters while it runs.
 | 7 | [save-load-3d](../save-load-3d) | 🟡 | Keeping the rest of it, and surviving your own next patch |
 | 8 | [object-pool-3d](../object-pool-3d) | 🟡 | The stutter that is not loading: allocation during play |
 | 9 | [multiplayer-3d](../multiplayer-3d) | 🔴 | Two peers, and the interpolation buffer that makes ten packets a second look like motion |
-| 10 | [client-prediction](../client-prediction) | 🔴 | And the half that cannot wait for a packet: moving now, and being corrected later |
+| 10 | [replication-visibility](../replication-visibility) | 🔴 | The built-in version of the same thing: `MultiplayerSynchronizer`, sending each peer only what is near it |
+| 11 | [client-prediction](../client-prediction) | 🔴 | And the half that cannot wait for a packet: moving now, and being corrected later |
+| 12 | [lag-compensation](../lag-compensation) | 🔴 | The server's half of the same problem: rewinding to what the shooter saw, so a hit does not depend on ping |
 
-**Missing from this path:** `MultiplayerSynchronizer`, and a screen reader.
+**Missing from this path:** a screen reader, and loading the streamed chunks off
+the main thread — [level-streaming](../level-streaming) decides which, and
+[threaded-loading](../threaded-loading) is the other half.
 
 ---
 

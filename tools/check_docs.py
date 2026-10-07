@@ -87,6 +87,8 @@ DEPRECATED = {
 WASD_EXEMPT = {}
 
 problems = []
+# Drift worth seeing that the person running this cannot fix from here.
+notes = []
 
 
 def fail(demo, message):
@@ -310,6 +312,7 @@ API_SECTION = re.compile(r"^## Key Godot APIs.*?(?=^## |\Z)", re.S | re.M)
 # moved to 4.7.1 and the table went on saying 4.7.
 CI_WORKFLOW = ".github/workflows/tests.yml"
 COMPAT_DOC = "docs/COMPATIBILITY.md"
+COMPAT_COUNT = re.compile(r"^_(\d+) demos across \d+ versions\._$", re.M)
 CI_MATRIX = re.compile(r"^\s*godot:\s*\[([^\]]*)\]", re.M)
 COMPAT_VERSIONS = re.compile(r"^Versions tested:\s*(.+)$", re.M)
 
@@ -449,6 +452,30 @@ def check_index():
                         % (footer.group(1), len(actual)))
 
 
+# The learning paths are what make the collection more than an index: they order
+# it, and tools/build_index.py turns that order into each demo's "Related demos"
+# links. A demo on no path gets no links from its neighbours, and nobody walking
+# a route ever reaches it — four demos had quietly ended up that way.
+PATHS_DOC = "docs/LEARNING_PATHS.md"
+PATH_STEP = re.compile(r"^\| \d+ \| \[([a-z0-9-]+)\]\(\.\./([a-z0-9-]+)\)", re.M)
+
+
+def check_learning_paths():
+    """Every demo is a step on at least one learning path."""
+    if not os.path.exists(PATHS_DOC):
+        return
+    steps = PATH_STEP.findall(read(PATHS_DOC))
+    for name, link in steps:
+        if name != link:
+            problems.append("%s: step '%s' links to '%s'" % (PATHS_DOC, name, link))
+    placed = {name for name, _ in steps}
+    for demo in sorted(set(demo_dirs()) - placed):
+        problems.append("%s: '%s' is not on any learning path" % (PATHS_DOC, demo))
+    for name in sorted(placed - set(demo_dirs())):
+        problems.append("%s: a path includes '%s' but there is no such demo"
+                        % (PATHS_DOC, name))
+
+
 def check_compat_versions():
     """The compatibility table must name the versions CI actually runs."""
     if not (os.path.exists(CI_WORKFLOW) and os.path.exists(COMPAT_DOC)):
@@ -470,6 +497,20 @@ def check_compat_versions():
             "results (tools/build_compat.py) rather than editing the numbers"
             % (COMPAT_DOC, ", ".join(stated), CI_WORKFLOW, ", ".join(tested)))
         return
+
+    # A demo added since the table was last copied in has never been through the
+    # matrix at all, and the badge goes on saying N/N with the newcomer outside
+    # the N. That is the other half that drifted: 58/58 next to 61 demos.
+    #
+    # A note rather than a failure: the fix is an artifact from a CI run that
+    # already includes the new demo, which the person adding it cannot produce
+    # before pushing. Failing here would only turn every new-demo PR red.
+    counted = COMPAT_COUNT.search(read(COMPAT_DOC))
+    if counted and int(counted.group(1)) != len(demo_dirs()):
+        notes.append(
+            "%s covers %s demos but there are %d — copy in the `compatibility` "
+            "artifact from a CI run that includes them" % (COMPAT_DOC, counted.group(1),
+                                                           len(demo_dirs())))
 
     # The README badge is generated alongside the table and goes stale with it.
     newest = tested[-1]
@@ -506,7 +547,11 @@ def main():
             check_cross_links(demo)
             check_tags(demo)
     check_index()
+    check_learning_paths()
     check_compat_versions()
+
+    for note in notes:
+        print("note: " + note)
 
     if problems:
         print("%d problem(s):\n" % len(problems))

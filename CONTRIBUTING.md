@@ -38,8 +38,16 @@ README with the six required sections. It passes `./run-tests.sh` and
 from broken.
 
 Then add a row to the index in the root `README.md` under the right category,
-and bump the two demo counts (the intro and the footer). `tools/check_docs.py`
-will tell you if you forget.
+bump the two demo counts (the intro and the footer), and add the demo as a step
+on whichever [learning path](docs/LEARNING_PATHS.md) it extends — that is where
+its "Related demos" links come from. `tools/check_docs.py` will tell you if you
+forget either.
+
+Run `tools/build_index.py` until `--check` is clean, rather than once. Adding a
+demo changes which demos are neighbours of which, so the first pass can leave a
+README it had already written pointing at the old set — a second pass settles
+it. Observed adding the sixty-second demo, where one run left
+`character-controller-3d` stale and CI would have failed on it.
 
 ## Tests
 
@@ -83,7 +91,7 @@ measures and how to read a report.
 | Check | What it catches |
 |-------|-----------------|
 | `./run-tests.sh` | Demos that fail to load, failing assertions, engine warnings, and suites that abort partway |
-| `tools/check_docs.py` | Missing README sections, controls the code never binds, APIs the Key Godot APIs table names but no file uses, index drift, demo-count drift, a compatibility table that has fallen behind the CI matrix, demos that link to nothing, suites too thin to be checking much, scenes with no light in them |
+| `tools/check_docs.py` | Missing README sections, controls the code never binds, APIs the Key Godot APIs table names but no file uses, index drift, demo-count drift, demos on no learning path, a compatibility table that has fallen behind the CI matrix, demos that link to nothing, suites too thin to be checking much, scenes with no light in them |
 | `tools/build_index.py --check` | A stale API index or stale related-demo links |
 | `tools/build_tags.py --check` | Concept tags that no longer match the source they are derived from |
 | `tools/mutate.py --check` | A test suite that got weaker (weekly, not per-push) |

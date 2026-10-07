@@ -104,6 +104,7 @@ ones where you are looking for *the* example rather than *an* example.
 | `MeshBuilder.grid_counts()` | [procedural-mesh](../procedural-mesh) |
 | `MeshBuilder.ring()` | [procedural-mesh](../procedural-mesh) |
 | `MultiMeshInstance3D` | [multimesh](../multimesh) |
+| `MultiplayerSynchronizer.add_visibility_filter()` | [replication-visibility](../replication-visibility) |
 | `NavigationServer3D` | [navigation-obstacle](../navigation-obstacle) |
 | `NavigationServer3D.map_force_update()` | [navigation-obstacle](../navigation-obstacle) |
 | `NavigationServer3D.map_get_path()` | [navigation-obstacle](../navigation-obstacle) |
@@ -138,6 +139,8 @@ ones where you are looking for *the* example rather than *an* example.
 | `Refraction.apparent_position()` | [screen-shader](../screen-shader) |
 | `Refraction.can_refract()` | [screen-shader](../screen-shader) |
 | `Refraction.fresnel()` | [screen-shader](../screen-shader) |
+| `Relevance.interval_for()` | [replication-visibility](../replication-visibility) |
+| `Relevance.stays_relevant()` | [replication-visibility](../replication-visibility) |
 | `ResourceLoader.load_threaded_get()` | [threaded-loading](../threaded-loading) |
 | `ResourceLoader.load_threaded_get_status()` | [threaded-loading](../threaded-loading) |
 | `ResourceLoader.load_threaded_request()` | [threaded-loading](../threaded-loading) |
@@ -232,13 +235,13 @@ ones where you are looking for *the* example rather than *an* example.
 | `ImmediateMesh` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
 | `Input.get_axis()` | [camera-clipping](../camera-clipping), [client-prediction](../client-prediction), [device-glyphs](../device-glyphs), [input-remapping](../input-remapping), [portal-3d](../portal-3d), [root-motion](../root-motion), [triplanar-mapping](../triplanar-mapping), [vehicle-3d](../vehicle-3d) |
 | `Input.get_connected_joypads()` | [device-glyphs](../device-glyphs), [gamepad-3d](../gamepad-3d) |
-| `Input.get_vector()` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [multiplayer-3d](../multiplayer-3d), [orbit-camera](../orbit-camera), [spring-arm-camera](../spring-arm-camera) |
+| `Input.get_vector()` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [first-person-controller](../first-person-controller), [gamepad-3d](../gamepad-3d), [multiplayer-3d](../multiplayer-3d), [orbit-camera](../orbit-camera), [replication-visibility](../replication-visibility), [spring-arm-camera](../spring-arm-camera) |
 | `Input.is_key_pressed()` | [character-controller-3d](../character-controller-3d), [first-person-controller](../first-person-controller), [screen-shader](../screen-shader), [vehicle-3d](../vehicle-3d) |
 | `InputMap.has_action()` | [device-glyphs](../device-glyphs), [input-remapping](../input-remapping) |
-| `MeshInstance3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d) _(+26 more)_ |
+| `MeshInstance3D` | [accessibility-3d](../accessibility-3d), [camera-framing](../camera-framing), [client-prediction](../client-prediction), [continuous-collision](../continuous-collision), [csg-blockout](../csg-blockout), [device-glyphs](../device-glyphs), [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d) _(+27 more)_ |
 | `NavigationAgent3D` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
 | `NavigationRegion3D` | [navigation-3d](../navigation-3d), [navigation-obstacle](../navigation-obstacle) |
-| `Node3D` | [accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing) _(+52 more)_ |
+| `Node3D` | [accessibility-3d](../accessibility-3d), [animation-in-code](../animation-in-code), [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [audio-3d](../audio-3d), [audio-buses](../audio-buses), [camera-clipping](../camera-clipping), [camera-framing](../camera-framing) _(+53 more)_ |
 | `PhysicsRayQueryParameters3D` | [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking) |
 | `PhysicsRayQueryParameters3D.create()` | [continuous-collision](../continuous-collision), [raycast-picking](../raycast-picking) |
 | `RayCast3D` | [shape-cast-3d](../shape-cast-3d), [two-bone-ik](../two-bone-ik) |
@@ -250,11 +253,11 @@ ones where you are looking for *the* example rather than *an* example.
 | `SubViewport` | [portal-3d](../portal-3d), [render-to-texture](../render-to-texture), [split-screen-3d](../split-screen-3d) |
 | `SurfaceTool` | [noise-terrain](../noise-terrain), [procedural-mesh](../procedural-mesh), [terrain-collision](../terrain-collision), [terrain-splatting](../terrain-splatting), [triplanar-mapping](../triplanar-mapping) |
 | `WorldEnvironment` | [environment-fog](../environment-fog), [volumetric-fog](../volumetric-fog) |
-| `add_child()` | [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d), [navigation-3d](../navigation-3d), [rigid-body-3d](../rigid-body-3d) |
+| `add_child()` | [editor-tool-3d](../editor-tool-3d), [joints-3d](../joints-3d), [navigation-3d](../navigation-3d), [replication-visibility](../replication-visibility), [rigid-body-3d](../rigid-body-3d) |
 | `move_and_slide()` | [character-controller-3d](../character-controller-3d), [character-push](../character-push), [root-motion](../root-motion), [shape-cast-3d](../shape-cast-3d) |
 | `move_toward()` | [animation-tree](../animation-tree), [area-trigger-3d](../area-trigger-3d), [character-controller-3d](../character-controller-3d), [cinematic-camera](../cinematic-camera) |
 | `queue_free()` | [editor-tool-3d](../editor-tool-3d), [object-pool-3d](../object-pool-3d) |
 
 ---
 
-_239 APIs across 60 demos._
+_242 APIs across 61 demos._
